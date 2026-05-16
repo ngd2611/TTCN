@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Biên bản hàng lỗi - Trường Thọ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+</head>
+<body class="bg-[#F4F7F9] text-slate-800">
+    <div class="p-6">
+        <!-- Submenu Tabs -->
+        <div class="mb-5 border-b border-slate-200">
+            <nav class="flex space-x-1">
+                <a href="DanhSachPhieuNhapKho.html" class="px-4 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent hover:border-slate-300 transition-colors">
+                    <i class="fas fa-list mr-2"></i>Danh sách phiếu nhập
+                </a>
+                <a href="TrangDSDeXuatNhapHang.html" class="px-4 py-2.5 text-sm font-medium text-slate-500 hover:text-slate-700 border-b-2 border-transparent hover:border-slate-300 transition-colors">
+                    <i class="fas fa-file-invoice mr-2"></i>Đề xuất nhập hàng
+                </a>
+                <a href="DanhSachBienBanHangLoi.html" class="px-4 py-2.5 text-sm font-semibold text-blue-600 border-b-2 border-blue-600">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Biên bản hàng lỗi
+                </a>
+            </nav>
+        </div>
+        <!-- Page Header -->
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-slate-800">Danh sách Biên bản hàng lỗi</h2>
+                <p class="text-sm text-slate-500 mt-1">Quản lý các biên bản ghi nhận hàng lỗi, vỡ trong quá trình nhập kho</p>
+            </div>
+            <button data-nav="defectiveReport" class="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-lg font-semibold text-sm shadow-sm transition-colors flex items-center">
+                <i class="fas fa-plus mr-2"></i> Lập biên bản hàng lỗi
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white border border-slate-200 rounded-xl p-4 mb-5 shadow-sm">
+            <div class="grid grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Tìm kiếm</label>
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input id="f-search" type="text" placeholder="Mã biên bản, phiếu nhập..." class="w-full border border-slate-300 rounded-lg pl-8 pr-3 py-2 text-sm focus:border-blue-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nhà cung cấp</label>
+                    <select id="f-ncc" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                        <option>Tất cả</option>
+                        <option>Công ty Knauf Việt Nam</option>
+                        <option>Công ty Vĩnh Tường</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Từ ngày</label>
+                    <input id="f-from" type="date" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Tới ngày</label>
+                    <div class="flex gap-2">
+                        <input id="f-to" type="date" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                        <button id="f-reset" class="text-slate-400 hover:text-blue-600 transition-colors px-2" title="Xóa bộ lọc"><i class="fas fa-times-circle"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-[12px] text-slate-500" id="f-counter"></div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full text-sm text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="px-5 py-3.5 font-bold text-slate-600 uppercase text-xs">Mã biên bản</th>
+                        <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs">Phiếu nhập</th>
+                        <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs">Nhà cung cấp</th>
+                        <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs">Ngày lập</th>
+                        <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs text-center">SL vật tư lỗi</th>
+                        <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs">Người lập</th>
+                        <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100" id="bb-tbody">
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-between">
+                <p class="text-sm text-slate-500">Hiển thị <span class="font-semibold">1-3</span> trong tổng số <span class="font-semibold">3</span> biên bản</p>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>Trước</button>
+                    <button class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-semibold">1</button>
+                    <button class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>Sau</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../assets/js/mock_data.js"></script>
+    <script src="../../assets/js/filter.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script>
+        (function () {
+            const list = JSON.parse(localStorage.getItem('ttcn_bien_ban') || '[]');
+            const tbody = document.getElementById('bb-tbody');
+            tbody.innerHTML = list.map(b => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-5 py-4"><a href="#" class="font-bold text-red-500 hover:underline">${b.ma}</a></td>
+                    <td class="px-4 py-4"><a href="#" class="font-semibold text-blue-600 hover:underline">${b.phieuNhap}</a></td>
+                    <td class="px-4 py-4 text-slate-700">${b.nhaCungCap}</td>
+                    <td class="px-4 py-4 text-slate-600">${b.ngay}</td>
+                    <td class="px-4 py-4 text-center"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold text-xs">${b.slLoi}</span></td>
+                    <td class="px-4 py-4 text-slate-600">${b.nguoiLap}</td>
+                    <td class="px-4 py-4 text-center">
+                        <button class="text-blue-600 hover:text-blue-700 mx-1"><i class="fas fa-eye"></i></button>
+                        <button class="text-slate-600 hover:text-slate-700 mx-1"><i class="fas fa-print"></i></button>
+                    </td>
+                </tr>`).join('');
+
+            FilterEngine.init({
+                tableBodyId: 'bb-tbody',
+                searchId: 'f-search',
+                dateFromId: 'f-from',
+                dateToId: 'f-to',
+                counterId: 'f-counter',
+                resetId: 'f-reset',
+                searchCols: [0, 1, 2, 5],
+                dateCol: 3
+            });
+
+            // Filter nhà cung cấp riêng
+            document.getElementById('f-ncc').addEventListener('change', function () {
+                const val = this.value;
+                document.querySelectorAll('#bb-tbody tr:not(.filter-empty-row)').forEach(row => {
+                    if (val === 'Tất cả') { row.style.display = ''; return; }
+                    const ncc = row.cells[2] ? row.cells[2].textContent.trim() : '';
+                    row.style.display = ncc.includes(val) ? '' : 'none';
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

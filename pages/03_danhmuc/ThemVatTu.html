@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm vật tư - He thong quan ly kho Truong Tho</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+</head>
+<body class="flex h-screen text-slate-800 overflow-hidden">
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        <!-- Page Content -->
+        <div class="flex-1 overflow-y-auto p-6 bg-[#F4F7F9]">
+<!-- Nút quay lại và Tiêu đề -->
+            <div class="mb-6 flex items-center space-x-4">
+                <button data-nav="materials" class="w-10 h-10 bg-white border border-slate-200 rounded-lg text-slate-500 hover:text-blue-600 hover:border-blue-300 shadow-sm flex items-center justify-center transition-all">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Thêm mới vật tư</h2>
+                    <p class="text-sm text-slate-500 mt-1">Nhập các thông tin chi tiết để tạo mã vật tư mới vào kho.</p>
+                </div>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8 max-w-5xl">
+                
+                <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-4 mb-6"><i class="fas fa-info-circle text-blue-500 mr-2"></i> Thông tin cơ bản</h3>
+
+                <form>
+                    <div class="grid grid-cols-2 gap-x-10 gap-y-6">
+                        <!-- Cột 1 -->
+                        <div class="space-y-6">
+                            <!-- Mã vật tư -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Mã vật tư <span class="text-red-500">*</span></label>
+                                <input type="text" value="Hệ thống tự động sinh (VT004)" class="w-full border border-slate-200 rounded-lg px-4 py-2.5 bg-slate-50 text-slate-500 focus:outline-none cursor-not-allowed" disabled>
+                            </div>
+                            
+                            <!-- Tên vật tư -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Tên vật tư <span class="text-red-500">*</span></label>
+                                <input type="text" placeholder="Nhập tên vật tư..." class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 transition-colors">
+                            </div>
+
+                            <!-- Nhóm vật tư -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Nhóm vật tư <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full border border-slate-300 rounded-lg pl-4 pr-10 py-2.5 appearance-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 bg-white transition-colors">
+                                        <option value="" disabled selected>-- Chọn nhóm vật tư --</option>
+                                        <option>Tấm trần nhựa</option>
+                                        <option>Tấm thạch cao</option>
+                                        <option>Hệ khung xương</option>
+                                        <option>Vật liệu mới</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute right-4 top-3.5 text-slate-400 text-xs pointer-events-none"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Đơn vị tính cơ bản -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Đơn vị tính cơ bản <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <select class="w-full border border-slate-300 rounded-lg pl-4 pr-10 py-2.5 appearance-none focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 bg-white transition-colors">
+                                        <option value="" disabled selected>-- Chọn đơn vị --</option>
+                                        <option>Tấm</option>
+                                        <option>Thanh</option>
+                                        <option>Kiện</option>
+                                        <option>Hộp</option>
+                                        <option>m2</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute right-4 top-3.5 text-slate-400 text-xs pointer-events-none"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cột 2 -->
+                        <div class="space-y-6">
+                            <!-- Quy cách & Độ dày (Cùng hàng) -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Quy cách</label>
+                                    <input type="text" placeholder="VD: 1220x2440" class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 transition-colors">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Độ dày</label>
+                                    <input type="text" placeholder="VD: 9mm" class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 transition-colors">
+                                </div>
+                            </div>
+
+                            <!-- Vị trí lưu kho -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Vị trí lưu kho mặc định</label>
+                                <input type="text" placeholder="VD: Kho Hạ Long - Line A - Kệ 2" class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 transition-colors">
+                            </div>
+
+                            <!-- Định mức tồn -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Định mức tồn tối thiểu</label>
+                                <input type="number" placeholder="Nhập số lượng cảnh báo hết hàng" class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 transition-colors">
+                            </div>
+
+                            <!-- Ghi chú thêm -->
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Ghi chú (Nếu có)</label>
+                                <textarea rows="2" placeholder="Nhập ghi chú hoặc đặc tính lưu ý của vật tư..." class="w-full border border-slate-300 rounded-lg px-4 py-2.5 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm text-slate-700 transition-colors resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nút Actions -->
+                    <div class="mt-10 pt-6 border-t border-slate-100 flex justify-end space-x-3">
+                        <button type="button" class="px-6 py-2.5 rounded-lg text-sm font-semibold text-slate-600 bg-white border border-slate-300 hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-200">
+                            Hủy bỏ
+                        </button>
+                        <button type="button" id="btn-luu" class="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 flex items-center">
+                            <i class="fas fa-save mr-2"></i> Lưu vật tư
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load Core Scripts -->
+    <script src="../../assets/js/mock_data.js"></script>
+    <script src="../../assets/js/navigation.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        (function () {
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input:not([disabled]), select, textarea');
+
+            // Auto-gen mã vật tư
+            const arr = JSON.parse(localStorage.getItem('ttcn_vattu') || '[]');
+            const nextNum = arr.length + 1;
+            const maInput = form.querySelector('input[disabled]');
+            if (maInput) maInput.value = 'Hệ thống tự động sinh (VT' + String(nextNum).padStart(3, '0') + ')';
+
+            document.getElementById('btn-luu').addEventListener('click', function () {
+                const ten = form.querySelectorAll('input:not([disabled])')[0].value.trim();
+                const nhom = form.querySelectorAll('select')[0].value;
+                const dvt = form.querySelectorAll('select')[1].value;
+                if (!ten || !nhom || !dvt) { alert('Vui lòng nhập đầy đủ thông tin bắt buộc!'); return; }
+
+                const list = JSON.parse(localStorage.getItem('ttcn_vattu') || '[]');
+                const ma = 'VT' + String(list.length + 1).padStart(3, '0');
+                list.push({
+                    ma, ten, nhom, dvt,
+                    quyCach: form.querySelectorAll('input:not([disabled])')[1]?.value || '',
+                    ton: 0
+                });
+                localStorage.setItem('ttcn_vattu', JSON.stringify(list));
+                alert('Đã lưu vật tư ' + ma + '!');
+                Navigation.navigateTo('materials');
+            });
+        })();
+    </script>
+</body>
+</html>

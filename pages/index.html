@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống quản lý kho Trường Thọ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/index.css">
+</head>
+<body class="flex h-screen bg-[#F3F4F6] text-slate-800 overflow-hidden">
+
+    <!-- Sidebar Trái -->
+    <aside class="w-64 bg-[#111827] flex flex-col shadow-xl z-20">
+        <!-- Logo -->
+        <div class="px-6 py-8">
+            <h1 class="text-2xl font-bold text-white mb-1">Trường Thọ</h1>
+            <p class="text-xs text-slate-400">Hệ thống quản lý kho</p>
+        </div>
+        
+        <!-- Menu -->
+        <nav class="flex-1 px-4 space-y-2" id="sidebar-menu">
+            <a href="02_tongquan/TrangTongQuan.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="tongquan">
+                <i class="fas fa-border-all w-6"></i> <span class="text-sm font-medium">Tổng quan</span>
+            </a>
+            <a href="03_danhmuc/TrangDanhMucVatTu.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="danhmuc">
+                <i class="fas fa-database w-6"></i> <span class="text-sm font-medium">Danh mục vật tư</span>
+            </a>
+            <a href="04_nhapkho/DanhSachPhieuNhapKho.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="nhapkho">
+                <i class="fas fa-box-open w-6"></i> <span class="text-sm font-medium">Quản lý Nhập kho</span>
+            </a>
+            <a href="05_xuatkho/DSPhieuXuatKho.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="xuatkho">
+                <i class="fas fa-shipping-fast w-6"></i> <span class="text-sm font-medium">Quản lý Xuất kho</span>
+            </a>
+            <a href="06_kiemke/DSDotKiemKe.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="kiemke">
+                <i class="fas fa-clipboard-check w-6"></i> <span class="text-sm font-medium">Kiểm kê & Xử lý</span>
+            </a>
+            <a href="07_baocao/TrangBaoCao.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="baocao">
+                <i class="fas fa-file-alt w-6"></i> <span class="text-sm font-medium">Báo cáo quản trị</span>
+            </a>
+            <a href="08_quantri/TrangQuanLyTaiKhoan.html" target="main_content" class="menu-item flex items-center px-4 py-3 text-slate-400 hover:text-white rounded-lg transition-colors" data-page="quantri">
+                <i class="fas fa-users-cog w-6"></i> <span class="text-sm font-medium">Quản lý tài khoản</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Bên Phải -->
+    <main class="flex-1 flex flex-col relative">
+        <!-- Top Header (Breadcrumb, Search, User Info) -->
+        <header class="bg-white h-16 border-b border-slate-200 flex items-center justify-between px-6 z-10">
+            <!-- Left Header -->
+            <div class="flex items-center space-x-6">
+                <div class="text-sm text-slate-500 flex items-center">
+                    <span>Trang chủ</span>
+                    <i class="fas fa-chevron-right text-xs mx-3 text-slate-300"></i>
+                    <span class="text-slate-800 font-medium" id="breadcrumb-current">Tổng quan</span>
+                </div>
+                
+                <div class="relative w-80">
+                    <i class="fas fa-search absolute left-3 top-2.5 text-slate-400"></i>
+                    <input type="text" placeholder="Tìm kiếm mã vật tư... (Ctrl + K)" class="w-full bg-slate-50 border border-slate-200 text-sm rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" id="global-search">
+                </div>
+            </div>
+
+            <!-- Right Header -->
+            <div class="flex items-center space-x-5">
+                <!-- Settings Dropdown -->
+                <div class="relative" id="settings-dropdown">
+                    <button class="text-slate-400 hover:text-slate-600 transition-colors" id="settings-btn">
+                        <i class="fas fa-cog text-lg"></i>
+                    </button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50">
+                        <div class="px-4 py-2 border-b border-slate-100">
+                            <p class="text-xs font-semibold text-slate-500 uppercase">Cài đặt</p>
+                        </div>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-user-cog w-5 text-slate-400"></i>
+                            <span>Tài khoản của tôi</span>
+                        </a>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-palette w-5 text-slate-400"></i>
+                            <span>Giao diện</span>
+                        </a>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-bell w-5 text-slate-400"></i>
+                            <span>Thông báo</span>
+                        </a>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-shield-alt w-5 text-slate-400"></i>
+                            <span>Bảo mật</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Help Button -->
+                <button class="text-slate-400 hover:text-slate-600 transition-colors" title="Trợ giúp">
+                    <i class="far fa-question-circle text-lg"></i>
+                </button>
+
+                <!-- Notifications Dropdown -->
+                <div class="relative" id="notification-dropdown">
+                    <button class="text-slate-400 hover:text-slate-600 relative transition-colors" id="notification-btn">
+                        <i class="far fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    </button>
+                    <div class="dropdown-menu hidden absolute right-0 mt-3 w-80 bg-white rounded-lg shadow-xl border border-slate-200 z-50">
+                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                            <p class="text-sm font-semibold text-slate-700">Thông báo</p>
+                            <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium">3 mới</span>
+                        </div>
+                        <div class="max-h-96 overflow-y-auto">
+                            <a href="#" class="notification-item flex items-start px-4 py-3 hover:bg-slate-50 border-b border-slate-50">
+                                <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-700 font-medium">Phiếu nhập PN-2024-001 đã được duyệt</p>
+                                    <p class="text-xs text-slate-500 mt-1">5 phút trước</p>
+                                </div>
+                            </a>
+                            <a href="#" class="notification-item flex items-start px-4 py-3 hover:bg-slate-50 border-b border-slate-50">
+                                <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-700 font-medium">Cảnh báo: Vật tư VT-001 sắp hết hàng</p>
+                                    <p class="text-xs text-slate-500 mt-1">1 giờ trước</p>
+                                </div>
+                            </a>
+                            <a href="#" class="notification-item flex items-start px-4 py-3 hover:bg-slate-50 border-b border-slate-50">
+                                <div class="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-700 font-medium">Kiểm kê kho A đã hoàn thành</p>
+                                    <p class="text-xs text-slate-500 mt-1">2 giờ trước</p>
+                                </div>
+                            </a>
+                            <a href="#" class="notification-item flex items-start px-4 py-3 hover:bg-slate-50">
+                                <div class="w-2 h-2 bg-slate-300 rounded-full mt-2 mr-3 flex-shrink-0"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm text-slate-500">Phiếu xuất PX-2024-015 đã được tạo</p>
+                                    <p class="text-xs text-slate-400 mt-1">1 ngày trước</p>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="px-4 py-2.5 border-t border-slate-100">
+                            <a href="#" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Xem tất cả thông báo →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-6 w-px bg-slate-200 mx-2"></div>
+
+                <!-- User Profile Dropdown -->
+                <div class="relative" id="profile-dropdown">
+                    <div class="flex items-center space-x-3 cursor-pointer" id="user-profile">
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-semibold text-slate-700" id="user-name">Vân (Giám đốc)</p>
+                            <p class="text-xs text-slate-500" id="user-role">Ban Giám đốc</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm" id="user-avatar">
+                            V
+                        </div>
+                    </div>
+                    <div class="dropdown-menu hidden absolute right-0 mt-3 w-64 bg-white rounded-lg shadow-xl border border-slate-200 py-2 z-50">
+                        <div class="px-4 py-3 border-b border-slate-100">
+                            <p class="text-sm font-semibold text-slate-700" id="dropdown-user-name">Vân</p>
+                            <p class="text-xs text-slate-500" id="dropdown-user-email">van@truongtho.vn</p>
+                        </div>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-user w-5 text-slate-400"></i>
+                            <span>Hồ sơ của tôi</span>
+                        </a>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-history w-5 text-slate-400"></i>
+                            <span>Lịch sử hoạt động</span>
+                        </a>
+                        <a href="#" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50">
+                            <i class="fas fa-key w-5 text-slate-400"></i>
+                            <span>Đổi mật khẩu</span>
+                        </a>
+                        <div class="border-t border-slate-100 my-2"></div>
+                        <a href="01_auth/Tranglogin.html" class="dropdown-item flex items-center px-4 py-2.5 text-sm text-red-600 hover:bg-red-50" id="logout-btn">
+                            <i class="fas fa-sign-out-alt w-5"></i>
+                            <span>Đăng xuất</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area (Dynamic with iframe) -->
+        <div id="content-area" class="flex-1 overflow-hidden">
+            <iframe 
+                id="main-frame" 
+                name="main_content" 
+                src="02_tongquan/TrangTongQuan.html" 
+                class="w-full h-full border-none">
+            </iframe>
+        </div>
+    </main>
+
+    <!-- Load Scripts -->
+    <script src="../assets/js/navigation.js"></script>
+    <script src="../assets/js/main.js"></script>
+    <script>
+        // Lắng nghe message từ iframe để navigate
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'navigate') {
+                const iframe = document.getElementById('main-frame');
+                if (iframe) {
+                    iframe.src = event.data.path;
+                    // Cập nhật sidebar active
+                    if (window.Navigation) {
+                        window.Navigation.updateSidebarActive(event.data.path);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thực hiện kiểm kê - He thong quan ly kho Truong Tho</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+</head>
+<body class="flex h-screen text-slate-800 overflow-hidden">
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        <!-- Page Content -->
+        <div class="flex-1 overflow-y-auto p-6 bg-[#F4F7F9]">
+<div>
+                    <h2 class="text-xl font-bold text-slate-800">Thực hiện kiểm kê</h2>
+                    <p class="text-[13px] text-slate-500 mt-1">Ghi nhận số lượng vật tư thực tế tại kho để đối chiếu với phần mềm.</p>
+                </div>
+            </div>
+
+            <!-- Form Container -->
+            <div class="flex flex-col gap-5">
+                
+                <!-- Master Data: Thông tin chung -->
+                <div class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
+                    <h3 class="text-[14px] font-bold text-slate-700 mb-4 pb-2 border-b border-slate-100"><i class="fas fa-info-circle mr-2 text-blue-500"></i>Thông tin Biên bản</h3>
+                    <div class="grid grid-cols-4 gap-6">
+                        <div class="col-span-1">
+                            <label class="block text-[12px] font-semibold text-slate-600 mb-1.5">Mã biên bản</label>
+                            <input type="text" value="BBKK-202605-004" disabled class="w-full bg-slate-50 border border-slate-200 text-slate-500 font-bold text-[13px] rounded-md px-3 py-2 cursor-not-allowed">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[12px] font-semibold text-slate-600 mb-1.5">Ngày lập</label>
+                            <input type="text" value="06/05/2026" disabled class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[13px] rounded-md px-3 py-2 cursor-not-allowed">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[12px] font-semibold text-slate-600 mb-1.5">Người kiểm kê</label>
+                            <input type="text" value="Lân (Thủ kho)" disabled class="w-full bg-slate-50 border border-slate-200 text-slate-600 text-[13px] rounded-md px-3 py-2 cursor-not-allowed">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[12px] font-semibold text-slate-600 mb-1.5">Trạng thái</label>
+                            <div class="mt-1">
+                                <span class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-md text-[12px] font-bold border border-blue-200"><i class="fas fa-spinner fa-spin mr-1"></i> Đang kiểm kê</span>
+                            </div>
+                        </div>
+                        <div class="col-span-4">
+                            <label class="block text-[12px] font-semibold text-slate-600 mb-1.5">Ghi chú đợt kiểm kê <span class="text-red-500">*</span></label>
+                            <input type="text" placeholder="Nhập mục đích, phạm vi kiểm kê..." value="Kiểm kê lô hàng sàn nhựa và trần thạch cao đầu tháng 5" class="w-full bg-white border border-slate-300 text-slate-700 text-[13px] rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Data: Danh sách vật tư -->
+                <div class="bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col">
+                    <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50 rounded-t-lg">
+                        <h3 class="text-[14px] font-bold text-slate-700"><i class="fas fa-list-ol mr-2 text-blue-500"></i>Danh sách vật tư kiểm đếm</h3>
+                        
+                        <!-- Toolbar thêm vật tư vào danh sách kiểm kê -->
+                        <div class="flex items-center space-x-2 w-1/2 justify-end">
+                            <div class="relative w-full max-w-sm">
+                                <i class="fas fa-barcode absolute left-3 top-2 text-slate-400 text-sm"></i>
+                                <input type="text" placeholder="Quét mã vạch hoặc gõ tìm mã vật tư..." class="w-full bg-white border border-slate-300 text-[13px] rounded-md pl-9 pr-3 py-1.5 focus:outline-none focus:border-blue-500 shadow-sm">
+                            </div>
+                            <button class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-3 py-1.5 rounded-md text-[13px] font-semibold flex items-center transition-colors whitespace-nowrap shadow-sm">
+                                <i class="fas fa-filter mr-1.5 text-slate-400"></i> Chọn theo nhóm
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Bảng nhập liệu -->
+                    <div class="overflow-x-auto text-[13px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white border-b border-slate-200">
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[5%] text-center">STT</th>
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[15%]">Mã VT</th>
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[25%]">Tên vật tư</th>
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[10%] text-center">ĐVT</th>
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[15%] text-center bg-slate-50">Tồn Máy (Sổ)</th>
+                                    <th class="py-3 px-4 font-bold text-[#2563EB] uppercase tracking-wide text-[11px] w-[15%] text-center bg-blue-50/30">Thực Tế</th>
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[10%] text-center">Chênh lệch</th>
+                                    <th class="py-3 px-4 font-bold text-slate-500 uppercase tracking-wide text-[11px] w-[5%] text-center"><i class="fas fa-cog"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                
+                                <!-- Hàng 1: Khớp số liệu -->
+                                <tr class="hover:bg-slate-50 transition-colors group">
+                                    <td class="py-3 px-4 text-center text-slate-400 font-medium">1</td>
+                                    <td class="py-3 px-4 font-bold text-slate-700">VT-TC-001</td>
+                                    <td class="py-3 px-4 text-slate-600">Tấm thạch cao tiêu chuẩn Knauf 9mm</td>
+                                    <td class="py-3 px-4 text-center text-slate-500 font-medium">Tấm</td>
+                                    <td class="py-3 px-4 text-center font-bold text-slate-600 bg-slate-50">500</td>
+                                    <td class="py-3 px-4 text-center bg-blue-50/30">
+                                        <input type="number" value="500" class="w-20 text-center bg-white border border-slate-300 rounded-md py-1 text-[13px] font-bold text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm">
+                                    </td>
+                                    <td class="py-3 px-4 text-center font-bold text-slate-400">0</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+
+                                <!-- Hàng 2: Thiếu hàng (Âm) -->
+                                <tr class="hover:bg-slate-50 transition-colors group">
+                                    <td class="py-3 px-4 text-center text-slate-400 font-medium">2</td>
+                                    <td class="py-3 px-4 font-bold text-slate-700">VT-KX-012</td>
+                                    <td class="py-3 px-4 text-slate-600">Khung xương trần chìm Vĩnh Tường ALPHA</td>
+                                    <td class="py-3 px-4 text-center text-slate-500 font-medium">Thanh</td>
+                                    <td class="py-3 px-4 text-center font-bold text-slate-600 bg-slate-50">1,250</td>
+                                    <td class="py-3 px-4 text-center bg-blue-50/30">
+                                        <input type="number" value="1245" class="w-20 text-center bg-white border border-red-400 rounded-md py-1 text-[13px] font-bold text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm">
+                                    </td>
+                                    <td class="py-3 px-4 text-center font-bold text-red-500">-5</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+
+                                <!-- Hàng 3: Thừa hàng (Dương) -->
+                                <tr class="hover:bg-slate-50 transition-colors group">
+                                    <td class="py-3 px-4 text-center text-slate-400 font-medium">3</td>
+                                    <td class="py-3 px-4 font-bold text-slate-700">VT-SN-005</td>
+                                    <td class="py-3 px-4 text-slate-600">Sàn nhựa giả gỗ hèm khóa SPC 4mm</td>
+                                    <td class="py-3 px-4 text-center text-slate-500 font-medium">Hộp</td>
+                                    <td class="py-3 px-4 text-center font-bold text-slate-600 bg-slate-50">85</td>
+                                    <td class="py-3 px-4 text-center bg-blue-50/30">
+                                        <input type="number" value="86" class="w-20 text-center bg-white border border-emerald-400 rounded-md py-1 text-[13px] font-bold text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm">
+                                    </td>
+                                    <td class="py-3 px-4 text-center font-bold text-emerald-600">+1</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+
+                                <!-- Hàng 4: Trống, đang đợi nhập -->
+                                <tr class="hover:bg-slate-50 transition-colors group">
+                                    <td class="py-3 px-4 text-center text-slate-400 font-medium">4</td>
+                                    <td class="py-3 px-4 font-bold text-slate-700">VT-OT-008</td>
+                                    <td class="py-3 px-4 text-slate-600">Tấm ốp than tre vân đá cẩm thạch</td>
+                                    <td class="py-3 px-4 text-center text-slate-500 font-medium">Tấm</td>
+                                    <td class="py-3 px-4 text-center font-bold text-slate-600 bg-slate-50">120</td>
+                                    <td class="py-3 px-4 text-center bg-blue-50/30">
+                                        <input type="number" placeholder="Nhập..." class="w-20 text-center bg-white border border-slate-300 rounded-md py-1 text-[13px] font-bold text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm placeholder-slate-300">
+                                    </td>
+                                    <td class="py-3 px-4 text-center font-bold text-slate-400">-</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button class="text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Table Footer Summary -->
+                    <div class="p-4 border-t border-slate-200 bg-slate-50 rounded-b-lg flex justify-between items-center">
+                        <p class="text-[12px] text-slate-500"><i class="fas fa-info-circle mr-1"></i> Các mặt hàng có chênh lệch hệ thống sẽ tự động chuyển sang quy trình <span class="font-semibold text-slate-700">Lập biên bản xử lý</span> sau khi hoàn thành.</p>
+                        <div class="flex space-x-6">
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Tổng dòng vật tư:</span>
+                                <span class="ml-2 text-[14px] font-bold text-slate-800">4</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] text-slate-500 uppercase tracking-wide font-bold">Số dòng chênh lệch:</span>
+                                <span class="ml-2 text-[14px] font-bold text-red-500">2</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Sticky Bottom Actions -->
+            <div class="mt-6 flex justify-end gap-3 border-t border-slate-200 pt-5">
+                <button class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-2 rounded-md text-[13px] font-bold transition-colors">
+                    Hủy bỏ
+                </button>
+                <button class="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2 rounded-md text-[13px] font-bold shadow-sm transition-colors flex items-center">
+                    <i class="far fa-save mr-2"></i> Lưu nháp
+                </button>
+                <button class="bg-[#2563EB] hover:bg-blue-700 text-white px-6 py-2 rounded-md text-[13px] font-bold shadow-sm transition-colors flex items-center">
+                    <i class="fas fa-check mr-2"></i> Hoàn thành & Tạo BB Xử lý
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Load Core Scripts -->
+    <script src="../../assets/js/navigation.js"></script>
+    <script src="../../assets/js/main.js"></script>
+</body>
+</html>
