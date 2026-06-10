@@ -15,6 +15,7 @@ const Navigation = {
         // 03. Danh mục vật tư
         materials: 'pages/03_danhmuc/TrangDanhMucVatTu.html',
         addMaterial: 'pages/03_danhmuc/ThemVatTu.html',
+        editMaterial: 'pages/03_danhmuc/SuaVatTu.html',
         
         // 04. Nhập kho
         importList: 'pages/04_nhapkho/DanhSachPhieuNhapKho.html',
@@ -60,6 +61,19 @@ const Navigation = {
                 const route = btn.getAttribute('data-nav');
                 console.log('👆 Button clicked with route:', route);
                 this.navigateTo(route);
+                return;
+            }
+
+            // Intercept sidebar links (target="main_content") để thêm cache-busting
+            const link = e.target.closest('a[target="main_content"]');
+            if (link) {
+                e.preventDefault();
+                const iframe = document.getElementById('main-frame');
+                if (iframe) {
+                    const basePath = link.getAttribute('href');
+                    iframe.src = basePath + '?v=' + Date.now();
+                    this.updateSidebarActive(basePath);
+                }
             }
         });
         console.log('✅ Button handlers setup complete');
@@ -75,23 +89,21 @@ const Navigation = {
             return;
         }
 
-        console.log(`📍 Navigating to: ${path}`);
+        const bust = path + (path.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        console.log(`📍 Navigating to: ${bust}`);
         
         // Kiểm tra xem đang ở trong iframe hay không
         const isInIframe = window.self !== window.top;
         
         if (isInIframe) {
-            // Đang trong iframe, gửi message cho parent window
-            window.parent.postMessage({ type: 'navigate', path: path, routeKey: routeKey }, '*');
+            window.parent.postMessage({ type: 'navigate', path: bust, routeKey: routeKey }, '*');
         } else {
-            // Đang ở trang chính, tìm iframe và navigate
             const iframe = document.getElementById('main-frame');
             if (iframe) {
-                iframe.src = path;
+                iframe.src = bust;
                 this.updateSidebarActive(path);
             } else {
-                // Không có iframe, navigate trực tiếp
-                window.location.href = path;
+                window.location.href = bust;
             }
         }
     },
@@ -104,12 +116,18 @@ const Navigation = {
         
         menuItems.forEach(item => {
             item.classList.remove('active');
+        });
+        
+        menuItems.forEach(item => {
             const href = item.getAttribute('href');
             
-            // Check nếu path bắt đầu với href folder
             if (path && href) {
-                const folder = href.split('/')[0];
-                if (path.startsWith(folder)) {
+                // So sánh folder con cụ thể (01_auth, 02_tongquan, 03_danhmuc, etc.)
+                // Lấy folder chứa thực tế: pages/XX_tenchuyen/
+                const pathMatch = path.match(/pages\/(\d+_\w+)\//);
+                const hrefMatch = href.match(/pages\/(\d+_\w+)\//);
+                
+                if (pathMatch && hrefMatch && pathMatch[1] === hrefMatch[1]) {
                     item.classList.add('active');
                     const pageName = item.getAttribute('data-page');
                     console.log('✅ Activated menu:', pageName);
@@ -128,16 +146,17 @@ const Navigation = {
 
     // Navigate với URL trực tiếp
     navigateToUrl(url) {
+        const bust = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
         const isInIframe = window.self !== window.top;
         
         if (isInIframe) {
-            window.parent.postMessage({ type: 'navigate', path: url }, '*');
+            window.parent.postMessage({ type: 'navigate', path: bust }, '*');
         } else {
             const iframe = document.getElementById('main-frame');
             if (iframe) {
-                iframe.src = url;
+                iframe.src = bust;
             } else {
-                window.location.href = url;
+                window.location.href = bust;
             }
         }
     },

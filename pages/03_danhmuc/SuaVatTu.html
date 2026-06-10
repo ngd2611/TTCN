@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Thêm vật tư - Hệ thống quản lý kho Trường Thọ</title>
+    <title>Chỉnh sửa vật tư - Hệ thống quản lý kho Trường Thọ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/global.css">
@@ -21,39 +21,55 @@
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-800" id="form-title">Thêm mới vật tư</h2>
-                    <p class="text-sm text-slate-500 mt-1" id="form-subtitle">Nhập các thông tin chi tiết để tạo mã vật tư mới vào kho.</p>
+                    <h2 class="text-2xl font-bold text-slate-800">Chỉnh sửa vật tư</h2>
+                    <p class="text-sm text-slate-500 mt-1">Cập nhật thông tin chi tiết của vật tư.</p>
+                </div>
+            </div>
+
+            <!-- Skeleton loader -->
+            <div id="skeleton" class="bg-white border border-slate-200 rounded-xl shadow-sm p-8 max-w-5xl animate-pulse">
+                <div class="h-5 bg-slate-200 rounded w-48 mb-8"></div>
+                <div class="grid grid-cols-2 gap-x-10 gap-y-6">
+                    <div class="space-y-5">
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                    </div>
+                    <div class="space-y-5">
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                        <div class="h-10 bg-slate-200 rounded"></div>
+                    </div>
                 </div>
             </div>
 
             <!-- Form Card -->
-            <div class="bg-white border border-slate-200 rounded-xl shadow-sm p-8 max-w-5xl">
+            <div id="form-card" class="hidden bg-white border border-slate-200 rounded-xl shadow-sm p-8 max-w-5xl">
 
                 <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-4 mb-6">
-                    <i class="fas fa-info-circle text-blue-500 mr-2"></i> Thông tin cơ bản
+                    <i class="fas fa-pen-to-square text-blue-500 mr-2"></i>
+                    Thông tin vật tư &mdash; <span id="label-ma" class="text-blue-600 font-mono"></span>
                 </h3>
 
-                <!-- Thông báo lỗi toàn form -->
+                <!-- Thông báo lỗi -->
                 <div id="form-error" class="hidden mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-4 py-3 flex items-start gap-2">
                     <i class="fas fa-exclamation-circle mt-0.5 shrink-0"></i>
                     <span id="form-error-msg"></span>
                 </div>
 
-                <form id="form-them-vat-tu" novalidate>
+                <form id="form-sua-vat-tu" novalidate>
                     <div class="grid grid-cols-2 gap-x-10 gap-y-6">
 
                         <!-- ── Cột trái ── -->
                         <div class="space-y-5">
 
-                            <!-- Mã vật tư -->
+                            <!-- Mã vật tư (readonly) -->
                             <div>
-                                <label for="Ma_Vat_Tu" class="block text-sm font-semibold text-slate-700 mb-2">
-                                    Mã vật tư <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" id="Ma_Vat_Tu" name="Ma_Vat_Tu"
-                                    placeholder="VD: VT007" maxlength="10" required
-                                    class="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-700 uppercase focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                                <p class="text-xs text-slate-400 mt-1">Tối đa 10 ký tự.</p>
+                                <label class="block text-sm font-semibold text-slate-700 mb-2">Mã vật tư</label>
+                                <input type="text" id="Ma_Vat_Tu" readonly
+                                    class="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm text-slate-400 bg-slate-50 cursor-not-allowed font-mono uppercase">
+                                <p class="text-xs text-slate-400 mt-1">Mã vật tư không thể thay đổi.</p>
                             </div>
 
                             <!-- Tên vật tư -->
@@ -61,8 +77,8 @@
                                 <label for="Ten_Vat_Tu" class="block text-sm font-semibold text-slate-700 mb-2">
                                     Tên vật tư <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" id="Ten_Vat_Tu" name="Ten_Vat_Tu"
-                                    placeholder="Nhập tên đầy đủ của vật tư..." required
+                                <input type="text" id="Ten_Vat_Tu" name="Ten_Vat_Tu" required
+                                    placeholder="Nhập tên đầy đủ của vật tư..."
                                     class="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
                             </div>
 
@@ -74,7 +90,7 @@
                                 <div class="relative">
                                     <select id="Ma_Nhom_Vat_Tu" name="Ma_Nhom_Vat_Tu" required
                                         class="w-full border border-slate-300 rounded-lg pl-4 pr-10 py-2.5 appearance-none text-sm text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                                        <option value="" disabled selected>— Đang tải... —</option>
+                                        <option value="" disabled>— Đang tải... —</option>
                                     </select>
                                     <i class="fas fa-chevron-down absolute right-4 top-3.5 text-slate-400 text-xs pointer-events-none"></i>
                                 </div>
@@ -88,7 +104,7 @@
                                 <div class="relative">
                                     <select id="Ma_DVT_Co_Ban" name="Ma_DVT_Co_Ban" required
                                         class="w-full border border-slate-300 rounded-lg pl-4 pr-10 py-2.5 appearance-none text-sm text-slate-700 bg-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
-                                        <option value="" disabled selected>— Đang tải... —</option>
+                                        <option value="" disabled>— Đang tải... —</option>
                                     </select>
                                     <i class="fas fa-chevron-down absolute right-4 top-3.5 text-slate-400 text-xs pointer-events-none"></i>
                                 </div>
@@ -125,8 +141,7 @@
                             <!-- Định mức tồn -->
                             <div>
                                 <label for="Dinh_Muc_Ton" class="block text-sm font-semibold text-slate-700 mb-2">Định mức tồn tối thiểu</label>
-                                <input type="number" id="Dinh_Muc_Ton" name="Dinh_Muc_Ton"
-                                    min="0" value="0"
+                                <input type="number" id="Dinh_Muc_Ton" name="Dinh_Muc_Ton" min="0" value="0"
                                     class="w-full border border-slate-300 rounded-lg px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
                                 <p class="text-xs text-slate-400 mt-1">Hệ thống sẽ cảnh báo khi tồn kho xuống dưới mức này.</p>
                             </div>
@@ -142,123 +157,105 @@
                         <button type="submit" id="btn-submit"
                             class="px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-[#2563EB] hover:bg-blue-700 shadow-sm transition-colors flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
                             <i id="btn-icon" class="fas fa-save"></i>
-                            <span id="btn-text">Lưu vật tư</span>
+                            <span id="btn-text">Lưu thay đổi</span>
                         </button>
                     </div>
                 </form>
             </div>
+
+            <!-- Trạng thái lỗi load trang -->
+            <div id="load-error" class="hidden bg-white border border-slate-200 rounded-xl shadow-sm p-12 max-w-5xl text-center">
+                <i class="fas fa-exclamation-circle text-4xl text-red-400 mb-4"></i>
+                <p class="text-slate-600 font-medium" id="load-error-msg">Không tìm thấy vật tư.</p>
+                <button data-nav="materials" class="mt-4 px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                    Quay lại danh sách
+                </button>
+            </div>
+
         </div>
     </main>
 
     <script src="../../assets/js/navigation.js?v=3"></script>
 
     <script>
-        // ── API URL - Tự động detect dựa trên domain hiện tại ────────────────
-        const API_BASE = window.location.origin.includes('localhost') 
+        const API_URL = window.location.origin.includes('localhost')
             ? 'http://localhost/TTCN/backend/controllers/VatTuController.php'
             : window.location.origin + '/TTCN/backend/controllers/VatTuController.php';
-        const API_URL = API_BASE;
 
-        // ── Detect edit mode từ URL parameter ──────────────────────────────────
-        let isEditMode = false;
-        let editMaVatTu = null;
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('ma')) {
-            isEditMode = true;
-            editMaVatTu = urlParams.get('ma');
-        }
+        // Lấy mã vật tư từ query string (?ma=VT001)
+        const maVatTu = new URLSearchParams(window.location.search).get('ma');
 
-        // ── Load dropdown Nhóm VT và ĐVT song song ───────────────────────────
-        async function loadDropdowns() {
+        // ── Khởi tạo: load dropdown + data vật tư song song ─────────────────
+        async function init() {
+            if (!maVatTu) {
+                showLoadError('URL thiếu tham số mã vật tư.');
+                return;
+            }
+
             try {
                 const ts = Date.now();
-                const [resNhom, resDvt] = await Promise.all([
+                const [resNhom, resDvt, resVatTu] = await Promise.all([
                     fetch(API_URL + '?action=get_nhom&t=' + ts, { cache: 'no-store' }),
-                    fetch(API_URL + '?action=get_dvt&t='  + ts, { cache: 'no-store' })
+                    fetch(API_URL + '?action=get_dvt&t='  + ts, { cache: 'no-store' }),
+                    fetch(API_URL + '?action=get_one&ma=' + encodeURIComponent(maVatTu) + '&t=' + ts, { cache: 'no-store' })
                 ]);
 
-                if (!resNhom.ok || !resDvt.ok) throw new Error('Server lỗi khi tải dropdown');
+                if (!resNhom.ok || !resDvt.ok || !resVatTu.ok) throw new Error('Server lỗi khi tải dữ liệu.');
 
-                const [jsonNhom, jsonDvt] = await Promise.all([resNhom.json(), resDvt.json()]);
+                const [jsonNhom, jsonDvt, jsonVatTu] = await Promise.all([
+                    resNhom.json(), resDvt.json(), resVatTu.json()
+                ]);
 
-                const selNhom = document.getElementById('Ma_Nhom_Vat_Tu');
-                const selDvt  = document.getElementById('Ma_DVT_Co_Ban');
-
-                selNhom.innerHTML = '<option value="" disabled selected>— Chọn nhóm vật tư —</option>';
-                (jsonNhom.data || []).forEach(function(item) {
-                    const opt = document.createElement('option');
-                    opt.value = item.Ma_Nhom_Vat_Tu;
-                    opt.textContent = item.Ten_Nhom_Vat_Tu;
-                    selNhom.appendChild(opt);
-                });
-
-                selDvt.innerHTML = '<option value="" disabled selected>— Chọn đơn vị tính —</option>';
-                (jsonDvt.data || []).forEach(function(item) {
-                    const opt = document.createElement('option');
-                    opt.value = item.Ma_DVT;
-                    opt.textContent = item.Ten_DVT;
-                    selDvt.appendChild(opt);
-                });
-
-                // Nếu edit mode, load dữ liệu vật tư
-                if (isEditMode && editMaVatTu) {
-                    await loadVatTu(editMaVatTu);
+                if (jsonVatTu.status !== 'success') {
+                    showLoadError('Không tìm thấy vật tư "' + maVatTu + '".');
+                    return;
                 }
 
+                buildDropdown('Ma_Nhom_Vat_Tu', jsonNhom.data || [], 'Ma_Nhom_Vat_Tu', 'Ten_Nhom_Vat_Tu');
+                buildDropdown('Ma_DVT_Co_Ban',  jsonDvt.data  || [], 'Ma_DVT',          'Ten_DVT');
+                fillForm(jsonVatTu.data);
+
+                document.getElementById('skeleton').classList.add('hidden');
+                document.getElementById('form-card').classList.remove('hidden');
+
             } catch (err) {
-                showError('Không thể tải dữ liệu dropdown: ' + err.message);
+                showLoadError('Lỗi kết nối: ' + err.message);
             }
         }
 
-        // ── Load dữ liệu vật tư để edit ─────────────────────────────────────
-        async function loadVatTu(maVatTu) {
-            try {
-                const res = await fetch(API_URL + '?ma=' + encodeURIComponent(maVatTu) + '&t=' + Date.now(), 
-                    { cache: 'no-store' });
-                
-                if (!res.ok) throw new Error('HTTP ' + res.status);
-                
-                const json = await res.json();
-                if (json.status !== 'success' || !json.data || json.data.length === 0) {
-                    throw new Error('Không tìm thấy vật tư');
-                }
-                
-                const vt = json.data[0];
-                populateForm(vt);
-                
-            } catch (err) {
-                console.error('❌ Load vật tư error:', err);
-                showError('Không thể tải dữ liệu vật tư: ' + err.message);
-            }
+        function buildDropdown(selectId, items, valKey, labelKey) {
+            const sel = document.getElementById(selectId);
+            sel.innerHTML = '';
+            items.forEach(function(item) {
+                const opt = document.createElement('option');
+                opt.value = item[valKey];
+                opt.textContent = item[labelKey];
+                sel.appendChild(opt);
+            });
         }
 
-        // ── Populate form với dữ liệu vật tư ────────────────────────────────
-        function populateForm(vt) {
-            document.getElementById('Ma_Vat_Tu').value = vt.Ma_Vat_Tu;
-            document.getElementById('Ma_Vat_Tu').disabled = true;
-            document.getElementById('Ten_Vat_Tu').value = vt.Ten_Vat_Tu;
+        function fillForm(vt) {
+            document.getElementById('Ma_Vat_Tu').value     = vt.Ma_Vat_Tu;
+            document.getElementById('Ten_Vat_Tu').value    = vt.Ten_Vat_Tu;
             document.getElementById('Ma_Nhom_Vat_Tu').value = vt.Ma_Nhom_Vat_Tu;
-            document.getElementById('Ma_DVT_Co_Ban').value = vt.Ma_DVT_Co_Ban;
-            document.getElementById('Quy_Cach').value = vt.Quy_Cach || '';
-            document.getElementById('Do_Day').value = vt.Do_Day || '';
+            document.getElementById('Ma_DVT_Co_Ban').value  = vt.Ma_DVT_Co_Ban;
+            document.getElementById('Quy_Cach').value       = vt.Quy_Cach       || '';
+            document.getElementById('Do_Day').value         = vt.Do_Day         || '';
             document.getElementById('Vi_Tri_Luu_Kho').value = vt.Vi_Tri_Luu_Kho || '';
-            document.getElementById('Dinh_Muc_Ton').value = parseInt(vt.Dinh_Muc_Ton) || 0;
-            
-            // Update heading
-            document.getElementById('form-title').textContent = 'Sửa vật tư';
-            document.getElementById('form-subtitle').textContent = 'Cập nhật thông tin vật tư "' + vt.Ten_Vat_Tu + '"';
-            document.getElementById('btn-text').textContent = 'Cập nhật vật tư';
+            document.getElementById('Dinh_Muc_Ton').value   = vt.Dinh_Muc_Ton   || 0;
+            document.getElementById('label-ma').textContent = vt.Ma_Vat_Tu;
+
+           
         }
 
-        // ── Submit form ───────────────────────────────────────────────────────
-        document.getElementById('form-them-vat-tu').addEventListener('submit', async function(e) {
+        // ── Submit ───────────────────────────────────────────────────────────
+        document.getElementById('form-sua-vat-tu').addEventListener('submit', async function(e) {
             e.preventDefault();
             hideError();
 
-            const get = function(id) { return document.getElementById(id).value.trim(); };
+            const get = id => document.getElementById(id).value.trim();
 
             const data = {
-                Ma_Vat_Tu:      get('Ma_Vat_Tu').toUpperCase(),
                 Ten_Vat_Tu:     get('Ten_Vat_Tu'),
                 Ma_Nhom_Vat_Tu: get('Ma_Nhom_Vat_Tu'),
                 Ma_DVT_Co_Ban:  get('Ma_DVT_Co_Ban'),
@@ -268,8 +265,6 @@
                 Dinh_Muc_Ton:   parseInt(document.getElementById('Dinh_Muc_Ton').value) || 0
             };
 
-            // Validate
-            if (!data.Ma_Vat_Tu)      return showError('Mã vật tư không được để trống.');
             if (!data.Ten_Vat_Tu)     return showError('Tên vật tư không được để trống.');
             if (!data.Ma_Nhom_Vat_Tu) return showError('Vui lòng chọn nhóm vật tư.');
             if (!data.Ma_DVT_Co_Ban)  return showError('Vui lòng chọn đơn vị tính.');
@@ -277,38 +272,28 @@
             setLoading(true);
 
             try {
-                const res = await fetch(API_URL, {
-                    method:  'POST',
+                const res = await fetch(API_URL + '?ma=' + encodeURIComponent(maVatTu), {
+                    method:  'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body:    JSON.stringify(data),
                     cache:   'no-store'
                 });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error('HTTP ' + res.status + ': ' + text);
-                }
-
                 const json = await res.json();
 
                 if (json.status === 'success') {
-                    const msg = isEditMode 
-                        ? 'Cập nhật vật tư "' + data.Ten_Vat_Tu + '" thành công!'
-                        : 'Thêm vật tư "' + data.Ten_Vat_Tu + '" thành công!';
-                    alert(msg);
                     Navigation.navigateTo('materials');
                 } else {
-                    showError(json.message || 'Thao tác thất bại. Mã vật tư có thể đã tồn tại.');
+                    showError(json.message || 'Cập nhật thất bại.');
                 }
             } catch (err) {
-                console.error('❌ Form submission error:', err);
-                showError('Lỗi kết nối server: ' + err.message);
+                showError('Lỗi kết nối: ' + err.message);
             } finally {
                 setLoading(false);
             }
         });
 
-        // ── Helpers ───────────────────────────────────────────────────────────
+        // ── Helpers ──────────────────────────────────────────────────────────
         function showError(msg) {
             const box = document.getElementById('form-error');
             document.getElementById('form-error-msg').textContent = msg;
@@ -321,14 +306,19 @@
         }
 
         function setLoading(state) {
-            const btn  = document.getElementById('btn-submit');
+            const btn = document.getElementById('btn-submit');
             btn.disabled = state;
             document.getElementById('btn-icon').className = state ? 'fas fa-spinner fa-spin' : 'fas fa-save';
-            document.getElementById('btn-text').textContent = state ? 'Đang lưu...' : 'Lưu vật tư';
+            document.getElementById('btn-text').textContent = state ? 'Đang lưu...' : 'Lưu thay đổi';
         }
 
-        // ── Khởi chạy ─────────────────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', loadDropdowns);
+        function showLoadError(msg) {
+            document.getElementById('skeleton').classList.add('hidden');
+            document.getElementById('load-error-msg').textContent = msg;
+            document.getElementById('load-error').classList.remove('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>

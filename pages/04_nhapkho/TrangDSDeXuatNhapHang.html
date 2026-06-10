@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Nhập kho - He thong quan ly kho Truong Tho</title>
+    <title>Danh sách Đề xuất nhập hàng - Trường Thọ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/global.css">
 </head>
 <body class="flex h-screen text-slate-800 overflow-hidden">
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col relative overflow-hidden">
-        <!-- Page Content -->
         <div class="flex-1 overflow-y-auto p-6 bg-[#F4F7F9]">
             <!-- Submenu Tabs -->
             <div class="mb-5 border-b border-slate-200">
@@ -27,11 +25,12 @@
                     </a>
                 </nav>
             </div>
-<!-- Page Title + Action -->
+
+            <!-- Page Title + Action -->
             <div class="flex items-start justify-between mb-5">
                 <div>
-                    <h2 class="text-[20px] font-bold text-slate-800 leading-tight">Danh sách đề xuất nhập hàng</h2>
-                    <p class="text-[13px] text-slate-500 mt-0.5">Quản lý và theo dõi trạng thái các yêu cầu nhập hàng nhận từ kho.</p>
+                    <h2 class="text-[20px] font-bold text-slate-800 leading-tight">Danh sách Đề xuất nhập hàng</h2>
+                    <p class="text-[13px] text-slate-500 mt-0.5">Quản lý các đề xuất nhập hàng do nhân viên kinh doanh lập, chờ kế toán phê duyệt.</p>
                 </div>
                 <div class="flex items-center space-x-2">
                     <button class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg text-[13px] font-semibold transition-colors flex items-center">
@@ -49,29 +48,24 @@
                     <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-[12px]"></i>
                     <input type="text" placeholder="Tìm mã đề xuất, nhà cung cấp..." class="w-full bg-slate-50 border border-slate-200 rounded-md pl-8 pr-3 py-1.5 text-[13px] outline-none focus:border-blue-500 focus:bg-white transition-colors">
                 </div>
-
-                <div class="flex flex-col min-w-[160px]">
-                    <select class="bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-[13px] font-medium outline-none focus:border-blue-500">
+                <div class="relative min-w-[160px]">
+                    <select class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-[13px] font-medium outline-none focus:border-blue-500 pr-8">
                         <option>Tất cả trạng thái</option>
-                        <option>Đã phê duyệt</option>
                         <option>Chờ phê duyệt</option>
+                        <option>Đã phê duyệt</option>
                         <option>Bị từ chối</option>
                     </select>
+                    <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[11px] pointer-events-none"></i>
                 </div>
-
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-[13px] text-slate-500">
+                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5">
                         <input type="date" class="bg-transparent outline-none text-[13px] text-slate-700 w-[130px]">
                     </div>
                     <span class="text-slate-400 text-[12px]">—</span>
-                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-[13px] text-slate-500">
+                    <div class="flex items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5">
                         <input type="date" class="bg-transparent outline-none text-[13px] text-slate-700 w-[130px]">
                     </div>
                 </div>
-
-                <button class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-colors ml-auto">
-                    <i class="fas fa-filter mr-2"></i> Lọc dữ liệu
-                </button>
             </div>
 
             <!-- Bảng dữ liệu -->
@@ -80,10 +74,11 @@
                     <table class="w-full text-[13px] text-left border-collapse">
                         <thead>
                             <tr class="bg-white border-b border-slate-200">
-                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Mã yêu cầu</th>
+                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Mã đề xuất</th>
                                 <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Ngày lập</th>
-                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Nhà cung cấp</th>
-                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Loại nhập kho</th>
+                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Nhà cung cấp dự kiến</th>
+                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Lý do đề xuất</th>
+                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center">Ngày cần hàng</th>
                                 <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center">Số mặt hàng</th>
                                 <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center">Trạng thái</th>
                                 <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center">Thao tác</th>
@@ -98,19 +93,18 @@
                                 </td>
                                 <td class="py-3 px-4 text-slate-600">05/05/2026 09:15</td>
                                 <td class="py-3 px-4 font-medium text-slate-800">Đại lý Daiichi Hạ Long</td>
-                                <td class="py-3 px-4 text-slate-600">Nhập mua từ nhà cung cấp</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-700">04</td>
+                                <td class="py-3 px-4 text-slate-600">Tồn kho tấm trần sắp hết, cần bổ sung trước mùa xây dựng</td>
+                                <td class="py-3 px-4 text-center text-slate-700 font-medium">10/05/2026</td>
+                                <td class="py-3 px-4 text-center font-semibold text-slate-700">4</td>
                                 <td class="py-3 px-4 text-center">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <i class="fas fa-check-circle text-[10px]"></i> Đã phê duyệt
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                    </div>
+                                    <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center mx-auto transition-colors" title="Xem chi tiết">
+                                        <i class="fas fa-eye text-[12px]"></i>
+                                    </button>
                                 </td>
                             </tr>
 
@@ -121,7 +115,8 @@
                                 </td>
                                 <td class="py-3 px-4 text-slate-600">05/05/2026 10:30</td>
                                 <td class="py-3 px-4 font-medium text-slate-800">Công ty TNHH Knauf Việt Nam</td>
-                                <td class="py-3 px-4 text-slate-600">Nhập kho định kỳ</td>
+                                <td class="py-3 px-4 text-slate-600">Khung xương trần chìm tồn kho dưới mức tối thiểu</td>
+                                <td class="py-3 px-4 text-center text-slate-700 font-medium">12/05/2026</td>
                                 <td class="py-3 px-4 text-center font-semibold text-slate-700">2</td>
                                 <td class="py-3 px-4 text-center">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
@@ -129,14 +124,14 @@
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
+                                    <div class="flex items-center justify-center space-x-1.5">
                                         <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
                                             <i class="fas fa-eye text-[12px]"></i>
                                         </button>
                                         <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="Chỉnh sửa">
                                             <i class="fas fa-pencil-alt text-[12px]"></i>
                                         </button>
-                                        <button class="w-7 h-7 rounded-md bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors" title="Xoá">
+                                        <button class="w-7 h-7 rounded-md bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors" title="Xóa">
                                             <i class="fas fa-trash text-[12px]"></i>
                                         </button>
                                     </div>
@@ -150,7 +145,8 @@
                                 </td>
                                 <td class="py-3 px-4 text-slate-600">04/05/2026 15:45</td>
                                 <td class="py-3 px-4 font-medium text-slate-800">Công ty Thép Hòa Phát</td>
-                                <td class="py-3 px-4 text-slate-600">Nhập hàng bổ sung</td>
+                                <td class="py-3 px-4 text-slate-600">Cần nhập thêm thanh thép theo đơn hàng khách</td>
+                                <td class="py-3 px-4 text-center text-slate-700 font-medium">08/05/2026</td>
                                 <td class="py-3 px-4 text-center font-semibold text-slate-700">12</td>
                                 <td class="py-3 px-4 text-center">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-red-50 text-red-600 border border-red-200">
@@ -158,11 +154,9 @@
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                    </div>
+                                    <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center mx-auto transition-colors" title="Xem chi tiết">
+                                        <i class="fas fa-eye text-[12px]"></i>
+                                    </button>
                                 </td>
                             </tr>
 
@@ -173,19 +167,18 @@
                                 </td>
                                 <td class="py-3 px-4 text-slate-600">03/05/2026 08:20</td>
                                 <td class="py-3 px-4 font-medium text-slate-800">Công ty CP Công nghiệp Daiichi</td>
-                                <td class="py-3 px-4 text-slate-600">Nhập hàng bảo hành</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-700">05</td>
+                                <td class="py-3 px-4 text-slate-600">Bổ sung tấm PVC theo kế hoạch nhập định kỳ</td>
+                                <td class="py-3 px-4 text-center text-slate-700 font-medium">07/05/2026</td>
+                                <td class="py-3 px-4 text-center font-semibold text-slate-700">5</td>
                                 <td class="py-3 px-4 text-center">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                         <i class="fas fa-check-circle text-[10px]"></i> Đã phê duyệt
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                    </div>
+                                    <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center mx-auto transition-colors" title="Xem chi tiết">
+                                        <i class="fas fa-eye text-[12px]"></i>
+                                    </button>
                                 </td>
                             </tr>
 
@@ -196,46 +189,24 @@
                                 </td>
                                 <td class="py-3 px-4 text-slate-600">02/05/2026 14:10</td>
                                 <td class="py-3 px-4 font-medium text-slate-800">Công ty TNHH Gyproc Việt Nam</td>
-                                <td class="py-3 px-4 text-slate-600">Nhập mua từ nhà cung cấp</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-700">08</td>
+                                <td class="py-3 px-4 text-slate-600">Sàn nhựa tồn kho thấp, khách hàng đang chờ hàng</td>
+                                <td class="py-3 px-4 text-center text-slate-700 font-medium">09/05/2026</td>
+                                <td class="py-3 px-4 text-center font-semibold text-slate-700">8</td>
                                 <td class="py-3 px-4 text-center">
                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                         <i class="fas fa-clock text-[10px]"></i> Chờ phê duyệt
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
+                                    <div class="flex items-center justify-center space-x-1.5">
                                         <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
                                             <i class="fas fa-eye text-[12px]"></i>
                                         </button>
                                         <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="Chỉnh sửa">
                                             <i class="fas fa-pencil-alt text-[12px]"></i>
                                         </button>
-                                        <button class="w-7 h-7 rounded-md bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors" title="Xoá">
+                                        <button class="w-7 h-7 rounded-md bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors" title="Xóa">
                                             <i class="fas fa-trash text-[12px]"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 6 - Đã phê duyệt -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">DXN-202604-006</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600">30/04/2026 11:05</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">Đại lý Vật liệu Xây dựng Bắc Nam</td>
-                                <td class="py-3 px-4 text-slate-600">Nhập kho định kỳ</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-700">15</td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <i class="fas fa-check-circle text-[10px]"></i> Đã phê duyệt
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-2">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -247,22 +218,17 @@
 
                 <!-- Pagination -->
                 <div class="px-4 py-3 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
-                    <p class="text-[12px] text-slate-500 font-medium">Hiển thị 1 - 10 trên tổng 45 đề xuất</p>
+                    <p class="text-[12px] text-slate-500 font-medium">Hiển thị 1 - 5 trên tổng 5 đề xuất</p>
                     <div class="flex items-center space-x-1">
-                        <button class="px-3 py-1 text-[12px] font-semibold text-slate-400 hover:text-slate-600 transition-colors">Trước</button>
+                        <button class="px-3 py-1 text-[12px] font-semibold text-slate-400" disabled>Trước</button>
                         <button class="w-7 h-7 rounded-md bg-[#2563EB] text-white text-[12px] font-bold flex items-center justify-center">1</button>
-                        <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-600 text-[12px] font-semibold flex items-center justify-center transition-colors">2</button>
-                        <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-600 text-[12px] font-semibold flex items-center justify-center transition-colors">3</button>
-                        <span class="text-slate-400 text-[12px] px-1">...</span>
-                        <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-600 text-[12px] font-semibold flex items-center justify-center transition-colors">5</button>
-                        <button class="px-3 py-1 text-[12px] font-semibold text-slate-600 hover:text-slate-800 transition-colors">Sau</button>
+                        <button class="px-3 py-1 text-[12px] font-semibold text-slate-400" disabled>Sau</button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Load Core Scripts -->
     <script src="../../assets/js/navigation.js"></script>
     <script src="../../assets/js/main.js"></script>
 </body>
