@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo & Quản trị - Trường Thọ WMS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+    
+    <style>
+        /* Modern UI transitions and helpers */
+        .modal-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease-out;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            transform: scale(0.97);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-[#F4F7F9] text-slate-800 min-h-screen overflow-x-hidden">
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-[90%] sm:max-w-md"></div>
+
+    <!-- Main Workspace Area (Topbar/Sidebar handled by shared layout) -->
+    <main class="p-6 space-y-6">
+
+        <!-- Admin Role Toggle Quick Switcher (Only visible to Admin) -->
+        <div id="admin-role-switcher" class="hidden bg-slate-900 text-white p-4 rounded-xl shadow-lg border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-indigo-650 flex items-center justify-center text-white text-base shadow-md">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-300">Đặc quyền của Admin</h4>
+                    <p class="text-[11px] text-slate-400">Chuyển đổi vai trò để kiểm thử nhanh hai phân hệ Lập và Duyệt báo cáo.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <span class="text-xs font-semibold text-slate-350 whitespace-nowrap">Xem giao diện:</span>
+                <select id="admin-role-toggle-select" class="w-full sm:w-auto bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-1.5 text-xs font-bold focus:outline-none cursor-pointer">
+                    <option value="Giám đốc">Giám đốc (Duyệt báo cáo)</option>
+                    <option value="Thủ kho">Thủ kho (Lập báo cáo)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ==================== WORKSPACE FOR THỦ KHO ==================== -->
+        <div id="thukho-workspace" class="hidden space-y-6">
+            <!-- Header Card -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice text-emerald-650"></i> Lập Báo Cáo Thống Kê Kho
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Truy xuất số liệu giao dịch, lựa chọn chứng từ nguồn và tổng hợp báo cáo gửi Ban Giám đốc.</p>
+                </div>
+                <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-200 uppercase inline-flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-user-shield text-[9px]"></i> Phân hệ Thủ kho
+                </span>
+            </div>
+
+            <!-- Keeper Notifications Panel -->
+            <div id="keeper-notifications-container" class="hidden space-y-3"></div>
+
+            <!-- Configuration & Filter Panel -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Cấu hình tham số báo cáo</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Report Type Selector -->
+                    <div>
+                        <label for="report-type" class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5">Loại báo cáo thống kê <span class="text-rose-500">*</span></label>
+                        <select id="report-type" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-700 outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                            <option value="Báo cáo Nhập kho">Báo cáo Nhập kho</option>
+                            <option value="Báo cáo Xuất kho">Báo cáo Xuất kho</option>
+                            <option value="Báo cáo Tồn kho" selected>Báo cáo Tồn kho</option>
+                            <option value="Báo cáo Hàng hư hỏng">Báo cáo Hàng hư hỏng</option>
+                        </select>
+                    </div>
+                    <!-- Start Date Picker -->
+                    <div>
+                        <label for="start-date" class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5">Từ ngày</label>
+                        <input type="date" id="start-date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-700 outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                    <!-- End Date Picker -->
+                    <div>
+                        <label for="end-date" class="block text-[11px] font-bold text-slate-400 uppercase mb-1.5">Đến ngày</label>
+                        <input type="date" id="end-date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-[13px] font-semibold text-slate-700 outline-none focus:border-blue-500 transition-colors">
+                    </div>
+                </div>
+                
+                <!-- Immediate Date Range Error Warning -->
+                <div id="date-error-msg" class="hidden bg-rose-50 border border-rose-200 text-rose-600 rounded-xl p-3 text-xs font-bold flex items-center gap-2 animate-pulse">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span>Cảnh báo lỗi: Ngày kết thúc (Đến ngày) không được nhỏ hơn ngày bắt đầu (Từ ngày). Vui lòng sửa lại!</span>
+                </div>
+
+                <div class="flex justify-end pt-2 border-t border-slate-100">
+                    <button type="button" id="retrieve-data-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-2.5 rounded-lg text-xs tracking-wider uppercase transition-colors shadow-md flex items-center gap-2 focus:outline-none">
+                        <i class="fa-solid fa-database"></i> Truy xuất số liệu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content Grid for Keeper (Only visible after clicking Retrieve Data) -->
+            <div id="keeper-data-panel" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left Column: Source Documents Selector -->
+                <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-fit">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" id="select-all-source" checked class="w-4 h-4 cursor-pointer accent-emerald-650 rounded">
+                            <h3 id="source-title" class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2.5">
+                                <i class="fa-solid fa-file-lines text-slate-500"></i> Chọn chứng từ nguồn
+                            </h3>
+                        </div>
+                        <span id="source-count" class="text-[11px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">0 phiếu</span>
+                    </div>
+                    <!-- Source list -->
+                    <div id="source-list-container" class="p-4 space-y-3 max-h-[350px] overflow-y-auto">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Right Column: Preview Aggregated Grid -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div id="preview-table-container" class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
+                            <div class="flex items-center gap-3">
+                                <h3 class="text-[13px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                                    <i class="fa-solid fa-table text-slate-500"></i> Bảng tổng hợp vật tư báo cáo
+                                </h3>
+                            </div>
+                            <span id="preview-tag" class="text-[11px] bg-blue-50 text-blue-600 font-bold border border-blue-100 px-2 py-0.5 rounded">Tồn kho thực tế</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-[13px] text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-white border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                                        <th class="py-3 px-6">Mã Vật Tư</th>
+                                        <th class="py-3 px-6">Tên Vật Tư</th>
+                                        <th class="py-3 px-6">ĐVT</th>
+                                        <th class="py-3 px-6 text-right">Số lượng</th>
+                                        <th class="py-3 px-6 text-right">Đơn giá</th>
+                                        <th class="py-3 px-6 text-right">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-table-body" class="divide-y divide-slate-150">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="bg-slate-50/70 border-t-2 border-slate-200 font-bold text-slate-750">
+                                        <td colspan="3" class="py-4 px-6 text-center uppercase tracking-wider text-[11px]">Tổng giá trị báo cáo được chọn</td>
+                                        <td colspan="3" id="preview-total-value" class="py-4 px-6 text-right text-blue-600 text-sm font-extrabold">0 ₫</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exception Flow 1 warning message -->
+            <div id="preview-empty-warning" class="hidden py-16 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col items-center justify-center text-center p-6 space-y-3">
+                <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <p class="text-sm font-bold text-rose-600">Không có dữ liệu để lập báo cáo</p>
+                <p class="text-xs text-slate-400">Vui lòng điều chỉnh lại khoảng thời gian hoặc chọn loại báo cáo khác có giao dịch.</p>
+            </div>
+
+            <!-- Action Primary Bar (Including Cancel Button for Sub-flow 2) -->
+            <div id="keeper-actions-bar" class="hidden flex justify-end gap-3">
+                <button type="button" id="cancel-report-btn" class="px-5 py-2.5 rounded-lg border border-slate-355 text-slate-650 font-bold text-xs hover:bg-slate-100 transition-colors uppercase tracking-wider focus:outline-none">
+                    Hủy bỏ
+                </button>
+                <button type="button" id="preview-report-detail-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-lg text-xs tracking-wider uppercase transition-colors shadow-md flex items-center gap-2 focus:outline-none">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> Xem báo cáo chi tiết
+                </button>
+            </div>
+
+            <!-- History Reports List for Keeper -->
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden mt-6 text-left">
+                <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <h3 class="text-[13px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-slate-500"></i> Danh sách báo cáo đã lập
+                    </h3>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                        <!-- Search Bar -->
+                        <div class="relative w-full sm:w-48">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="keeper-search-input" placeholder="Tìm theo mã..." class="w-full bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 rounded-lg pl-9 pr-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                        <!-- Report Type Filter -->
+                        <select id="keeper-filter-type" class="w-full sm:w-40 bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                            <option value="">Tất cả loại</option>
+                            <option value="Báo cáo Tồn kho">Báo cáo Tồn kho</option>
+                            <option value="Báo cáo Nhập kho">Báo cáo Nhập kho</option>
+                            <option value="Báo cáo Xuất kho">Báo cáo Xuất kho</option>
+                            <option value="Báo cáo Hàng hư hỏng">Báo cáo Hàng hư hỏng</option>
+                        </select>
+                        <!-- Status Filter -->
+                        <select id="keeper-filter-status" class="w-full sm:w-40 bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Chờ phê duyệt">Chờ phê duyệt</option>
+                            <option value="Đã phê duyệt">Đã phê duyệt</option>
+                            <option value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
+                        </select>
+                        <!-- Reset Button -->
+                        <button type="button" id="keeper-reset-filter-btn" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-650 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors focus:outline-none flex items-center justify-center gap-1.5" title="Làm mới bộ lọc">
+                            <i class="fa-solid fa-rotate text-[10px]"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-[13px] text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                                <th class="py-4 px-6">Mã Báo Cáo</th>
+                                <th class="py-4 px-6">Loại Báo Cáo</th>
+                                <th class="py-4 px-6">Ngày Lập</th>
+                                <th class="py-4 px-6">Trạng Thái</th>
+                                <th class="py-4 px-6">Phản hồi của Giám đốc</th>
+                                <th class="py-4 px-6 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keeper-reports-table-body" class="divide-y divide-slate-150">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Empty State -->
+                <div id="keeper-reports-empty-state" class="hidden py-16 flex flex-col items-center justify-center text-slate-400 bg-white">
+                    <i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-350"></i>
+                    <p class="text-sm font-semibold">Bạn chưa lập báo cáo thống kê nào.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== WORKSPACE FOR GIÁM ĐỐC ==================== -->
+        <div id="giamdoc-workspace" class="hidden space-y-6">
+            <!-- Header Card -->
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-clipboard-check text-purple-650"></i> Duyệt Báo Cáo Thống Kê
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Xem chi tiết báo cáo từ Thủ kho, duyệt phê duyệt hoặc gửi phản hồi yêu cầu kiểm tra lại.</p>
+                </div>
+                <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-[11px] font-bold border border-purple-200 uppercase inline-flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-user-shield text-[9px]"></i> Phân hệ Giám đốc
+                </span>
+            </div>
+
+            <!-- Pending Reports Grid Card -->
+            <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <h3 class="text-[13px] font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-slate-500"></i> Danh sách báo cáo cần xử lý
+                    </h3>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+                        <!-- Search Bar -->
+                        <div class="relative w-full sm:w-48">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </span>
+                            <input type="text" id="director-search-input" placeholder="Tìm theo mã..." class="w-full bg-slate-50 border border-slate-200 text-slate-700 placeholder-slate-400 rounded-lg pl-9 pr-3 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors">
+                        </div>
+                        <!-- Report Type Filter -->
+                        <select id="director-filter-type" class="w-full sm:w-40 bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                            <option value="">Tất cả loại</option>
+                            <option value="Báo cáo Tồn kho">Báo cáo Tồn kho</option>
+                            <option value="Báo cáo Nhập kho">Báo cáo Nhập kho</option>
+                            <option value="Báo cáo Xuất kho">Báo cáo Xuất kho</option>
+                            <option value="Báo cáo Hàng hư hỏng">Báo cáo Hàng hư hỏng</option>
+                        </select>
+                        <!-- Status Filter -->
+                        <select id="director-filter-status" class="w-full sm:w-40 bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-blue-500 transition-colors cursor-pointer">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Chờ phê duyệt">Chờ phê duyệt</option>
+                            <option value="Đã phê duyệt">Đã phê duyệt</option>
+                            <option value="Yêu cầu chỉnh sửa">Yêu cầu chỉnh sửa</option>
+                        </select>
+                        <!-- Reset Button -->
+                        <button type="button" id="director-reset-filter-btn" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-650 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-bold transition-colors focus:outline-none flex items-center justify-center gap-1.5" title="Làm mới bộ lọc">
+                            <i class="fa-solid fa-rotate text-[10px]"></i> Làm mới
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-[13px] text-left border-collapse">
+                        <thead>
+                            <tr class="bg-white border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                                <th class="py-4 px-6">Mã Báo Cáo</th>
+                                <th class="py-4 px-6">Loại Báo Cáo</th>
+                                <th class="py-4 px-6">Người Lập</th>
+                                <th class="py-4 px-6">Ngày Lập</th>
+                                <th class="py-4 px-6">Trạng Thái</th>
+                                <th class="py-4 px-6">Phản hồi của Giám đốc</th>
+                                <th class="py-4 px-6 text-right">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-table-body" class="divide-y divide-slate-150">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Empty State -->
+                <div id="reports-empty-state" class="hidden py-16 flex flex-col items-center justify-center text-slate-400 bg-white">
+                    <i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-350"></i>
+                    <p class="text-sm font-semibold">Hiện tại không có báo cáo nào cần xử lý.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ==================== POPUP: XEM CHI TIẾT BÁO CÁO (Modal Detail) ==================== -->
+    <div id="detail-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-md p-4">
+        <div class="modal-content bg-slate-100 w-full max-w-4xl rounded-xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 bg-white flex justify-between items-center flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass-chart text-slate-700"></i>
+                    <h3 class="text-sm font-bold text-slate-800" id="detail-title">Xem chi tiết báo cáo thống kê</h3>
+                </div>
+                <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-650 transition-colors focus:outline-none">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable Paper Layout) -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow bg-slate-100">
+                <!-- White Paper Sheet Document -->
+                <div class="bg-white border border-slate-300 shadow-xl p-8 rounded-lg max-w-3xl mx-auto space-y-8 relative text-slate-800 font-sans min-h-[750px]">
+                    <!-- Watermark for Status -->
+                    <div id="paper-watermark" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none text-5xl font-black uppercase tracking-widest rotate-12">
+                        CHỜ PHÊ DUYỆT
+                    </div>
+
+                    <!-- Header Letterhead -->
+                    <div class="flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-4 gap-4">
+                        <div class="space-y-1 text-left">
+                            <h5 class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Trường Thọ WMS</h5>
+                            <h4 class="text-xs font-black text-slate-700 uppercase">CÔNG TY CỔ PHẦN VLXD TRƯỜNG THỌ</h4>
+                            <p class="text-[10px] text-slate-400 font-semibold">Đường số 3, KCN Sóng Thần, Dĩ An, Bình Dương</p>
+                        </div>
+                        <div class="text-left sm:text-right space-y-1">
+                            <h4 id="paper-report-id" class="text-xs font-bold text-slate-700 font-mono">Số báo cáo: BC001</h4>
+                            <p id="paper-report-date" class="text-[10px] text-slate-400 font-semibold font-mono">Ngày lập: 2026-06-11</p>
+                        </div>
+                    </div>
+
+                    <!-- Centered Document Title -->
+                    <div class="text-center space-y-2">
+                        <h2 id="paper-report-title" class="text-lg font-black tracking-widest uppercase text-slate-900">BÁO CÁO TỒN KHO THỰC TẾ</h2>
+                        <p id="paper-report-period" class="text-[11px] text-slate-500 font-medium italic">Khoảng thời gian: Hệ thống hiện tại</p>
+                    </div>
+
+                    <!-- Metadata Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs border-y border-slate-100 py-3 bg-slate-50/50 px-4 rounded-lg text-left">
+                        <div>
+                            <span class="text-slate-400 font-semibold">Người lập báo cáo:</span>
+                            <span id="paper-creator" class="font-bold text-slate-700 ml-1">tam.thukho</span>
+                        </div>
+                        <div class="sm:text-right">
+                            <span class="text-slate-400 font-semibold">Trạng thái hiện tại:</span>
+                            <span id="paper-status-badge" class="ml-1"></span>
+                        </div>
+                    </div>
+
+                    <!-- Item details table -->
+                    <div class="border border-slate-200 rounded-lg overflow-hidden shadow-sm">
+                        <table class="w-full text-xs text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[10px]">
+                                    <th class="py-2.5 px-4">Mã Vật Tư</th>
+                                    <th class="py-2.5 px-4">Tên Vật Tư</th>
+                                    <th class="py-2.5 px-4">ĐVT</th>
+                                    <th class="py-2.5 px-4 text-right">Số lượng</th>
+                                    <th class="py-2.5 px-4 text-right">Đơn giá</th>
+                                    <th class="py-2.5 px-4 text-right">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-table-body" class="divide-y divide-slate-150">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-slate-50 font-bold border-t border-slate-200 text-slate-800">
+                                    <td colspan="3" class="py-3.5 px-4 text-center uppercase tracking-wider text-[10px]">Tổng giá trị</td>
+                                    <td colspan="3" id="detail-total-value" class="py-3.5 px-4 text-right text-blue-600 font-extrabold text-xs">0 ₫</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Proportion bars inside paper sheet -->
+                    <div class="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200 text-left">
+                        <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-slate-400"></i> Phân tích tỷ trọng giá trị mặt hàng
+                        </h4>
+                        <div id="chart-bars-container" class="space-y-2.5">
+                            <!-- Custom stacked progress bars -->
+                        </div>
+                    </div>
+
+                    <!-- Existing feedback display -->
+                    <div id="feedback-display-container" class="hidden bg-amber-50 border border-amber-200 p-4 rounded-lg text-left space-y-1">
+                        <div class="flex items-center gap-1.5 text-amber-800 font-bold text-[11px]">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <span>Phản hồi kiểm tra lại từ Giám đốc:</span>
+                        </div>
+                        <p id="feedback-display-text" class="text-xs font-semibold text-amber-700 leading-relaxed italic"></p>
+                    </div>
+
+                    <!-- Signatures Block -->
+                    <div class="grid grid-cols-2 gap-4 pt-10 text-center text-xs">
+                        <div class="space-y-16">
+                            <div>
+                                <p class="font-bold text-slate-500 uppercase text-[10px] tracking-wider">Thủ kho lập báo cáo</p>
+                                <p class="text-[10px] text-slate-400 italic">(Ký và ghi rõ họ tên)</p>
+                            </div>
+                            <p id="paper-creator-name" class="font-bold text-slate-700 underline">Trần Minh Tâm</p>
+                        </div>
+                        <div class="space-y-16">
+                            <div>
+                                <p class="font-bold text-slate-500 uppercase text-[10px] tracking-wider">Giám đốc phê duyệt</p>
+                                <p class="text-[10px] text-slate-400 italic">(Ký, đóng dấu)</p>
+                            </div>
+                            <div class="relative flex justify-center">
+                                <!-- Red approved stamp (only visible when approved) -->
+                                <div id="approved-stamp" class="hidden absolute top-[-50px] border-4 border-rose-600 text-rose-600 rounded-lg px-4 py-1 text-xs font-black uppercase tracking-widest rotate-[-12deg] select-none bg-white/95 shadow-lg">
+                                    ĐÃ PHÊ DUYỆT
+                                </div>
+                                <p class="font-bold text-slate-700">Nguyễn Thị Vân</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input area for recheck feedback (stays outside the paper sheet, at the bottom) -->
+                <div class="max-w-3xl mx-auto mt-4">
+                    <div id="recheck-input-box" class="hidden bg-white border border-slate-200 p-4.5 rounded-xl space-y-3.5 shadow-md">
+                        <div class="text-left">
+                            <label for="recheck-feedback-textarea" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Lý do yêu cầu kiểm tra lại <span class="text-rose-500">*</span></label>
+                            <textarea id="recheck-feedback-textarea" placeholder="Nhập lý do chi tiết hoặc các vật tư cần kiểm định lại..." class="w-full bg-slate-50 border border-slate-300 text-slate-800 rounded-lg p-3 text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium h-24 shadow-inner resize-none"></textarea>
+                            <span id="recheck-error-msg" class="hidden text-rose-550 text-[11px] mt-1 font-semibold items-center gap-1">
+                                <i class="fa-solid fa-circle-exclamation"></i> Vui lòng điền phản hồi lý do kiểm tra lại.
+                            </span>
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <button type="button" id="cancel-recheck-btn" class="px-3 py-1.5 border border-slate-355 text-slate-650 font-bold rounded-lg text-xs hover:bg-slate-100 transition-colors focus:outline-none">
+                                Hủy bỏ
+                            </button>
+                            <button type="button" id="confirm-recheck-btn" class="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg text-xs transition-colors shadow-sm focus:outline-none">
+                                Xác nhận gửi yêu cầu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 flex-shrink-0">
+                <!-- Status Banner if reports are locked -->
+                <div id="locked-status-banner" class="hidden text-xs text-slate-500 font-bold italic flex items-center gap-1.5">
+                    <i class="fa-solid fa-lock text-slate-400"></i> Báo cáo này đã xử lý xong và ở trạng thái khóa.
+                </div>
+                
+                <div class="flex justify-end gap-2.5 w-full sm:w-auto ml-auto items-center">
+                    <button type="button" class="close-modal-btn px-4 py-2 rounded-lg border border-slate-350 text-slate-650 font-bold text-[13px] hover:bg-slate-100 transition-colors focus:outline-none">
+                        Đóng
+                    </button>
+                    <!-- Active action buttons -->
+                    <div id="active-action-buttons" class="flex gap-2.5">
+                        <button type="button" id="recheck-trigger-btn" class="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold text-[13px] transition-colors focus:outline-none shadow-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-rotate-left text-xs"></i> Yêu cầu kiểm tra lại
+                        </button>
+                        <button type="button" id="approve-report-btn" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[13px] transition-colors focus:outline-none shadow-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check text-xs"></i> Phê duyệt báo cáo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MOCKUP CORE JAVASCRIPT ENGINE -->
+    <script>
+        const STORAGE_KEY = 'BAO_CAO_LOG';
+
+        // Master array of core inventory items (mockVatTu)
+        const mockVatTu = [
+            { Ma_Vat_Tu: 'VT-TC-001', Ten_Vat_Tu: 'Tấm thạch cao tiêu chuẩn Gyproc', Ma_DVT_Co_Ban: 'Tấm', So_Luong_Ton: 550, So_Luong_Hong_Vo: 10, Don_Gia_Gia_Dinh: 155000, Initial_Qty: 500 },
+            { Ma_Vat_Tu: 'VT-TC-002', Ten_Vat_Tu: 'Tấm thạch cao chống ẩm Knauf', Ma_DVT_Co_Ban: 'Tấm', So_Luong_Ton: 120, So_Luong_Hong_Vo: 5, Don_Gia_Gia_Dinh: 180000, Initial_Qty: 205 },
+            { Ma_Vat_Tu: 'VT-SG-005', Ten_Vat_Tu: 'Sàn gỗ công nghiệp 8mm - Walnut', Ma_DVT_Co_Ban: 'm2', So_Luong_Ton: 1250, So_Luong_Hong_Vo: 0, Don_Gia_Gia_Dinh: 250000, Initial_Qty: 1200 },
+            { Ma_Vat_Tu: 'VT-OT-008', Ten_Vat_Tu: 'Tấm ốp than tre vân đá cẩm thạch', Ma_DVT_Co_Ban: 'Tấm', So_Luong_Ton: 45, So_Luong_Hong_Vo: 2, Don_Gia_Gia_Dinh: 350000, Initial_Qty: 82 }
+        ];
+
+        // Seed mock transaction histories for Receipts, Issues, and Damages (spanning across May and June 2026)
+        const transactionLogs = [
+            // Receipts (Phiếu Nhập)
+            { phieuId: 'PN001', type: 'Nhập', ngayLap: '2026-05-10', maVatTu: 'VT-TC-001', quantity: 200, price: 150000 },
+            { phieuId: 'PN001', type: 'Nhập', ngayLap: '2026-05-10', maVatTu: 'VT-SG-005', quantity: 300, price: 240000 },
+            { phieuId: 'PN002', type: 'Nhập', ngayLap: '2026-06-05', maVatTu: 'VT-TC-001', quantity: 150, price: 155000 },
+            { phieuId: 'PN002', type: 'Nhập', ngayLap: '2026-06-05', maVatTu: 'VT-SG-005', quantity: 200, price: 250000 },
+
+            // Issues (Phiếu Xuất)
+            { phieuId: 'PX001', type: 'Xuất', ngayLap: '2026-05-12', maVatTu: 'VT-TC-001', quantity: 100, price: 155000 },
+            { phieuId: 'PX001', type: 'Xuất', ngayLap: '2026-05-12', maVatTu: 'VT-SG-005', quantity: 150, price: 250000 },
+            { phieuId: 'PX002', type: 'Xuất', ngayLap: '2026-06-08', maVatTu: 'VT-TC-002', quantity: 80, price: 180000 },
+            { phieuId: 'PX002', type: 'Xuất', ngayLap: '2026-06-08', maVatTu: 'VT-SG-005', quantity: 300, price: 250000 },
+
+            // Damages (Biên bản lỗi / Hư hỏng)
+            { phieuId: 'BB001', type: 'Hư hỏng', ngayLap: '2026-05-15', maVatTu: 'VT-TC-001', quantity: 10, price: 155000 },
+            { phieuId: 'BB002', type: 'Hư hỏng', ngayLap: '2026-06-02', maVatTu: 'VT-TC-002', quantity: 5, price: 180000 }
+        ];
+
+        // Seed default reports loaded if storage is empty
+        const defaultReports = [
+            {
+                reportId: 'BC001',
+                reportType: 'Báo cáo Tồn kho',
+                creator: 'tam.thukho',
+                createdAt: '2026-06-10',
+                status: 'Chờ phê duyệt',
+                feedback: '',
+                items: [
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 550, price: 155000 },
+                    { itemId: 'VT-TC-002', itemName: 'Tấm thạch cao chống ẩm Knauf', unit: 'Tấm', quantity: 120, price: 180000 },
+                    { itemId: 'VT-SG-005', itemName: 'Sàn gỗ công nghiệp 8mm - Walnut', unit: 'm2', quantity: 1250, price: 250000 },
+                    { itemId: 'VT-OT-008', itemName: 'Tấm ốp than tre vân đá cẩm thạch', unit: 'Tấm', quantity: 45, price: 350000 }
+                ]
+            },
+            {
+                reportId: 'BC002',
+                reportType: 'Báo cáo Nhập kho',
+                creator: 'tam.thukho',
+                createdAt: '2026-06-09',
+                status: 'Đã phê duyệt',
+                feedback: '',
+                items: [
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 200, price: 150000 },
+                    { itemId: 'VT-SG-005', itemName: 'Sàn gỗ công nghiệp 8mm - Walnut', unit: 'm2', quantity: 500, price: 240000 }
+                ]
+            },
+            {
+                reportId: 'BC003',
+                reportType: 'Báo cáo Hàng hư hỏng',
+                creator: 'tam.thukho',
+                createdAt: '2026-06-08',
+                status: 'Yêu cầu chỉnh sửa',
+                feedback: 'Số lượng vật tư lỗi hư hỏng chưa khớp với biên bản kiểm kê hao hụt thực tế. Cần rà soát lại.',
+                items: [
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 10, price: 155000 },
+                    { itemId: 'VT-TC-002', itemName: 'Tấm thạch cao chống ẩm Knauf', unit: 'Tấm', quantity: 5, price: 180000 }
+                ]
+            },
+            {
+                reportId: 'BC004',
+                reportType: 'Báo cáo Xuất kho',
+                creator: 'tam.thukho',
+                createdAt: '2026-06-07',
+                status: 'Chờ phê duyệt',
+                feedback: '',
+                items: [
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 100, price: 155000 },
+                    { itemId: 'VT-SG-005', itemName: 'Sàn gỗ công nghiệp 8mm - Walnut', unit: 'm2', quantity: 150, price: 250000 }
+                ]
+            },
+            {
+                reportId: 'BC005',
+                reportType: 'Báo cáo Nhập kho',
+                creator: 'tam.thukho',
+                createdAt: '2026-06-05',
+                status: 'Yêu cầu chỉnh sửa',
+                feedback: 'Đơn giá nhập của Sàn gỗ Walnut ở phiếu PN002 bị lệch so với hợp đồng mua hàng (240k vs 250k). Đề nghị kiểm tra lại chứng từ gốc.',
+                items: [
+                    { itemId: 'VT-SG-005', itemName: 'Sàn gỗ công nghiệp 8mm - Walnut', unit: 'm2', quantity: 200, price: 250000 },
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 150, price: 155000 }
+                ]
+            },
+            {
+                reportId: 'BC006',
+                reportType: 'Báo cáo Tồn kho',
+                creator: 'tam.thukho',
+                createdAt: '2026-05-31',
+                status: 'Đã phê duyệt',
+                feedback: '',
+                items: [
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 400, price: 155000 },
+                    { itemId: 'VT-TC-002', itemName: 'Tấm thạch cao chống ẩm Knauf', unit: 'Tấm', quantity: 150, price: 180000 },
+                    { itemId: 'VT-SG-005', itemName: 'Sàn gỗ công nghiệp 8mm - Walnut', unit: 'm2', quantity: 1000, price: 250000 }
+                ]
+            },
+            {
+                reportId: 'BC007',
+                reportType: 'Báo cáo Hàng hư hỏng',
+                creator: 'tam.thukho',
+                createdAt: '2026-05-16',
+                status: 'Đã phê duyệt',
+                feedback: '',
+                items: [
+                    { itemId: 'VT-TC-001', itemName: 'Tấm thạch cao tiêu chuẩn Gyproc', unit: 'Tấm', quantity: 10, price: 155000 }
+                ]
+            }
+        ];
+
+        function getReportsLog() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            if (data) {
+                try {
+                    const parsed = JSON.parse(data);
+                    // Reset if the stored array does not contain the newer seeded reports
+                    if (parsed.length < 7 || !parsed.some(r => r.reportId === 'BC005')) {
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReports));
+                        return defaultReports;
+                    }
+                    return parsed;
+                } catch(e) {
+                    console.error("Error parsing reports log:", e);
+                }
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReports));
+            return defaultReports;
+        }
+
+        function saveReportsLog(log) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+        }
+
+        function generateNextReportId(log) {
+            if (log.length === 0) return 'BC001';
+            let maxNum = 0;
+            log.forEach(rep => {
+                const match = rep.reportId.match(/^BC(\d+)$/);
+                if (match) {
+                    const num = parseInt(match[1]);
+                    if (num > maxNum) maxNum = num;
+                }
+            });
+            return 'BC' + String(maxNum + 1).padStart(3, '0');
+        }
+
+        // DOM elements
+        const thukhoWorkspace = document.getElementById('thukho-workspace');
+        const giamdocWorkspace = document.getElementById('giamdoc-workspace');
+
+        // Phân hệ Thủ kho DOM elements
+        const reportTypeSelect = document.getElementById('report-type');
+        const startDateInput = document.getElementById('start-date');
+        const endDateInput = document.getElementById('end-date');
+        const previewTableBody = document.getElementById('preview-table-body');
+        const previewTotalValue = document.getElementById('preview-total-value');
+        const previewTag = document.getElementById('preview-tag');
+        const cancelReportBtn = document.getElementById('cancel-report-btn');
+        const dateErrorMsg = document.getElementById('date-error-msg');
+        
+        const retrieveDataBtn = document.getElementById('retrieve-data-btn');
+        const selectAllSource = document.getElementById('select-all-source');
+        const previewReportDetailBtn = document.getElementById('preview-report-detail-btn');
+        const keeperDataPanel = document.getElementById('keeper-data-panel');
+        const keeperActionsBar = document.getElementById('keeper-actions-bar');
+        const sourceListContainer = document.getElementById('source-list-container');
+
+        // Giám đốc Workspace nodes
+        const reportsTableBody = document.getElementById('reports-table-body');
+        const reportsEmptyState = document.getElementById('reports-empty-state');
+
+        // Detail Modal nodes
+        const detailModal = document.getElementById('detail-modal');
+        const detailTitle = document.getElementById('detail-title');
+        const detailTableBody = document.getElementById('detail-table-body');
+        const detailTotalValue = document.getElementById('detail-total-value');
+        const chartBarsContainer = document.getElementById('chart-bars-container');
+        
+        const feedbackDisplayContainer = document.getElementById('feedback-display-container');
+        const feedbackDisplayText = document.getElementById('feedback-display-text');
+        
+        const recheckInputBox = document.getElementById('recheck-input-box');
+        const recheckTextarea = document.getElementById('recheck-feedback-textarea');
+        const recheckErrorMsg = document.getElementById('recheck-error-msg');
+        
+        const lockedStatusBanner = document.getElementById('locked-status-banner');
+        const activeActionButtons = document.getElementById('active-action-buttons');
+        
+        const approveReportBtn = document.getElementById('approve-report-btn');
+        const recheckTriggerBtn = document.getElementById('recheck-trigger-btn');
+        const cancelRecheckBtn = document.getElementById('cancel-recheck-btn');
+        const confirmRecheckBtn = document.getElementById('confirm-recheck-btn');
+
+        let activeReport = null;
+        let currentPreviewItems = [];
+        
+        // Luồng chọn chứng từ nguồn
+        let activeSourceDocs = []; // Array of { id, label, type, date }
+        let selectedSourceIds = new Set(); // Set of checked phieuId or Ma_Vat_Tu
+
+        // Determine current session user role
+        function getActiveUserSession() {
+            try {
+                const session = localStorage.getItem('ttcn_user_session') || localStorage.getItem('user_session');
+                if (session) {
+                    return JSON.parse(session);
+                }
+            } catch(e) {}
+            return { role: 'Thủ kho', username: 'tam.thukho' }; // Default fallback
+        }
+
+        // Initialize Workspaces
+        function initWorkspaces() {
+            const user = getActiveUserSession();
+            const role = user.role;
+            
+            const switcher = document.getElementById('admin-role-switcher');
+            if (role === 'Admin') {
+                if (switcher) switcher.classList.remove('hidden');
+                const toggleSelect = document.getElementById('admin-role-toggle-select');
+                if (toggleSelect) {
+                    toggleSelect.value = 'Giám đốc';
+                    toggleSelect.addEventListener('change', (e) => {
+                        switchWorkspaceView(e.target.value);
+                    });
+                }
+                switchWorkspaceView('Giám đốc');
+            } else {
+                if (switcher) switcher.classList.add('hidden');
+                switchWorkspaceView(role);
+            }
+        }
+
+        function switchWorkspaceView(viewRole) {
+            if (viewRole === 'Giám đốc' || viewRole === 'Admin') {
+                thukhoWorkspace.classList.add('hidden');
+                giamdocWorkspace.classList.remove('hidden');
+                renderDirectorWorkspace();
+            } else {
+                giamdocWorkspace.classList.add('hidden');
+                thukhoWorkspace.classList.remove('hidden');
+                
+                // Re-seed or reset unread status of seed notifications so they always trigger when entering Keeper workspace
+                try {
+                    const activeUser = getActiveUserSession().username || 'tam.thukho';
+                    let notifications = JSON.parse(localStorage.getItem('wms_notifications') || '[]');
+                    let hasUnread = notifications.some(n => (n.recipient === 'tam.thukho' || n.recipient === activeUser) && n.read === false);
+                    if (!hasUnread) {
+                        notifications = [
+                            {
+                                id: 'NTF_SEED_001',
+                                message: 'Báo cáo BC003 bị yêu cầu chỉnh sửa lại. Lý do: "Số lượng vật tư lỗi hư hỏng chưa khớp với biên bản kiểm kê hao hụt thực tế. Cần rà soát lại."',
+                                recipient: 'tam.thukho',
+                                createdAt: new Date().toLocaleTimeString() + ' ' + new Date().toLocaleDateString(),
+                                read: false
+                            },
+                            {
+                                id: 'NTF_SEED_002',
+                                message: 'Báo cáo BC005 bị yêu cầu chỉnh sửa lại. Lý do: "Đơn giá nhập của Sàn gỗ Walnut ở phiếu PN002 bị lệch so với hợp đồng mua hàng (240k vs 250k). Đề nghị kiểm tra lại chứng từ gốc."',
+                                recipient: 'tam.thukho',
+                                createdAt: new Date().toLocaleTimeString() + ' ' + new Date().toLocaleDateString(),
+                                read: false
+                            }
+                        ];
+                        localStorage.setItem('wms_notifications', JSON.stringify(notifications));
+                    }
+                } catch(e) {}
+
+                renderKeeperWorkspace();
+                renderKeeperReportsList();
+                renderKeeperNotifications();
+
+                // Trigger automatic alert notification toast on entry
+                try {
+                    const notifications = JSON.parse(localStorage.getItem('wms_notifications') || '[]');
+                    const activeUser = getActiveUserSession().username || 'tam.thukho';
+                    const unread = notifications.filter(n => (n.recipient === 'tam.thukho' || n.recipient === activeUser) && n.read === false);
+                    unread.forEach(n => {
+                        const bcId = n.message.match(/BC\d+/);
+                        const label = bcId ? bcId[0] : 'báo cáo';
+                        showToast(`Yêu cầu rà soát ${label}: ${n.message}`, 'error');
+                    });
+                } catch(e) {}
+            }
+        }
+
+        // Immediate Date Range validation
+        function validateDateRange() {
+            const startDateVal = startDateInput.value;
+            const endDateVal = endDateInput.value;
+            
+            if (startDateVal && endDateVal && startDateVal > endDateVal) {
+                // Display error immediately with red borders
+                dateErrorMsg.classList.remove('hidden');
+                startDateInput.classList.add('border-rose-500', 'focus:border-rose-500');
+                endDateInput.classList.add('border-rose-500', 'focus:border-rose-500');
+                
+                // Hide table, lock button
+                keeperDataPanel.classList.add('hidden');
+                keeperActionsBar.classList.add('hidden');
+                document.getElementById('preview-empty-warning').classList.add('hidden');
+                
+                retrieveDataBtn.disabled = true;
+                retrieveDataBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                retrieveDataBtn.classList.add('bg-slate-350', 'text-slate-500', 'cursor-not-allowed', 'opacity-60');
+                return false;
+            } else {
+                dateErrorMsg.classList.add('hidden');
+                startDateInput.classList.remove('border-rose-500', 'focus:border-rose-500');
+                endDateInput.classList.remove('border-rose-500', 'focus:border-rose-500');
+                
+                retrieveDataBtn.disabled = false;
+                retrieveDataBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                retrieveDataBtn.classList.remove('bg-slate-350', 'text-slate-500', 'cursor-not-allowed', 'opacity-60');
+                return true;
+            }
+        }
+
+        // ==================== THỦ KHO WORKFLOW ====================
+        function renderKeeperWorkspace() {
+            // Set date inputs default values (this month range)
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            startDateInput.value = firstDay.toISOString().split('T')[0];
+            endDateInput.value = today.toISOString().split('T')[0];
+            
+            validateDateRange();
+            
+            // Hide preview panels by default
+            keeperDataPanel.classList.add('hidden');
+            keeperActionsBar.classList.add('hidden');
+            document.getElementById('preview-empty-warning').classList.add('hidden');
+        }
+
+        function retrieveKeeperData() {
+            if (!validateDateRange()) return;
+
+            const reportType = reportTypeSelect.value;
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            const emptyWarning = document.getElementById('preview-empty-warning');
+
+            // Clear previous states
+            activeSourceDocs = [];
+            selectedSourceIds.clear();
+            previewTag.textContent = reportType;
+
+            // Restrict data to year 2026. From 2027 onwards (years > 2026), no data will be generated.
+            const startYear = startDate ? new Date(startDate).getFullYear() : 2026;
+            const endYear = endDate ? new Date(endDate).getFullYear() : 2026;
+            
+            if (startYear > 2026 || endYear > 2026) {
+                // Show empty warn and exit
+                keeperDataPanel.classList.add('hidden');
+                keeperActionsBar.classList.add('hidden');
+                emptyWarning.classList.remove('hidden');
+                return;
+            }
+
+            if (reportType === 'Báo cáo Tồn kho') {
+                document.getElementById('source-title').innerHTML = '<i class="fa-solid fa-boxes-stacked text-slate-500"></i> Chọn vật tư báo cáo tồn';
+                // Source is list of materials with calculated stock levels
+                mockVatTu.forEach(vt => {
+                    const totalNhap = transactionLogs
+                        .filter(t => t.type === 'Nhập' && t.maVatTu === vt.Ma_Vat_Tu && (!endDate || t.ngayLap <= endDate))
+                        .reduce((sum, t) => sum + t.quantity, 0);
+                        
+                    const totalXuat = transactionLogs
+                        .filter(t => t.type === 'Xuất' && t.maVatTu === vt.Ma_Vat_Tu && (!endDate || t.ngayLap <= endDate))
+                        .reduce((sum, t) => sum + t.quantity, 0);
+                        
+                    const totalHong = transactionLogs
+                        .filter(t => t.type === 'Hư hỏng' && t.maVatTu === vt.Ma_Vat_Tu && (!endDate || t.ngayLap <= endDate))
+                        .reduce((sum, t) => sum + t.quantity, 0);
+                    
+                    const calculatedStock = vt.Initial_Qty + totalNhap - totalXuat - totalHong;
+
+                    activeSourceDocs.push({
+                        id: vt.Ma_Vat_Tu,
+                        label: `${vt.Ma_Vat_Tu} - ${vt.Ten_Vat_Tu}`,
+                        type: 'Vật tư',
+                        date: `Số lượng tồn: ${calculatedStock.toLocaleString()} ${vt.Ma_DVT_Co_Ban}`
+                    });
+                });
+            } else {
+                document.getElementById('source-title').innerHTML = '<i class="fa-solid fa-file-invoice text-slate-500"></i> Chọn chứng từ nguồn';
+                // Source is transactions list
+                const txType = reportType === 'Báo cáo Nhập kho' ? 'Nhập' : 
+                               reportType === 'Báo cáo Xuất kho' ? 'Xuất' : 'Hư hỏng';
+
+                const matchingLogs = transactionLogs.filter(t => {
+                    const matchesType = t.type === txType;
+                    const matchesStart = !startDate || t.ngayLap >= startDate;
+                    const matchesEnd = !endDate || t.ngayLap <= endDate;
+                    return matchesType && matchesStart && matchesEnd;
+                });
+
+                // Find unique phieuIds
+                const uniquePhieus = {};
+                matchingLogs.forEach(t => {
+                    if (!uniquePhieus[t.phieuId]) {
+                        uniquePhieus[t.phieuId] = t.ngayLap;
+                    }
+                });
+
+                Object.keys(uniquePhieus).forEach(phieuId => {
+                    const labelPrefix = reportType === 'Báo cáo Nhập kho' ? 'Phiếu Nhập' :
+                                        reportType === 'Báo cáo Xuất kho' ? 'Phiếu Xuất' : 'Biên bản';
+                    activeSourceDocs.push({
+                        id: phieuId,
+                        label: `${labelPrefix} ${phieuId}`,
+                        type: 'Phiếu',
+                        date: uniquePhieus[phieuId]
+                    });
+                });
+            }
+
+            if (activeSourceDocs.length === 0) {
+                // EXCEPTION FLOW 1 (Luồng phụ 1): Aggregation empty
+                keeperDataPanel.classList.add('hidden');
+                keeperActionsBar.classList.add('hidden');
+                emptyWarning.classList.remove('hidden');
+            } else {
+                emptyWarning.classList.add('hidden');
+                keeperDataPanel.classList.remove('hidden');
+                keeperActionsBar.classList.remove('hidden');
+
+                // Select all by default
+                activeSourceDocs.forEach(doc => selectedSourceIds.add(doc.id));
+                selectAllSource.checked = true;
+
+                renderSourceSelectorList();
+                calculateAndRenderAggregatedPreview();
+            }
+        }
+
+        // Render source list with checkboxes
+        function renderSourceSelectorList() {
+            const countLabel = document.getElementById('source-count');
+            const reportType = reportTypeSelect.value;
+
+            countLabel.textContent = `${activeSourceDocs.length} ${reportType === 'Báo cáo Tồn kho' ? 'mặt hàng' : 'chứng từ'}`;
+
+            sourceListContainer.innerHTML = activeSourceDocs.map(doc => {
+                const isChecked = selectedSourceIds.has(doc.id);
+                const dateHtml = doc.date ? `<span class="text-[10px] text-slate-400 font-semibold font-mono block mt-0.5"><i class="fa-regular fa-calendar-days"></i> ${doc.date}</span>` : '';
+                return `
+                    <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer text-left">
+                        <input type="checkbox" data-doc-id="${doc.id}" ${isChecked ? 'checked' : ''} class="source-checkbox mt-1 w-4 h-4 cursor-pointer accent-emerald-650 rounded">
+                        <div class="flex-grow">
+                            <span class="text-xs font-bold text-slate-700 block leading-tight">${doc.label}</span>
+                            ${dateHtml}
+                        </div>
+                    </label>
+                `;
+            }).join('');
+
+            // Bind checkbox change listeners
+            sourceListContainer.querySelectorAll('.source-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const docId = e.target.getAttribute('data-doc-id');
+                    if (e.target.checked) {
+                        selectedSourceIds.add(docId);
+                    } else {
+                        selectedSourceIds.delete(docId);
+                    }
+                    selectAllSource.checked = selectedSourceIds.size === activeSourceDocs.length;
+                    calculateAndRenderAggregatedPreview();
+                });
+            });
+        }
+
+        // Select All Source items click handler
+        selectAllSource.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                activeSourceDocs.forEach(doc => selectedSourceIds.add(doc.id));
+            } else {
+                selectedSourceIds.clear();
+            }
+            renderSourceSelectorList();
+            calculateAndRenderAggregatedPreview();
+        });
+
+        // Query & Aggregate dynamically
+        function calculateAndRenderAggregatedPreview() {
+            const reportType = reportTypeSelect.value;
+            const endDate = endDateInput.value;
+            let results = [];
+
+            if (reportType === 'Báo cáo Tồn kho') {
+                mockVatTu.forEach(vt => {
+                    if (selectedSourceIds.has(vt.Ma_Vat_Tu)) {
+                        const totalNhap = transactionLogs
+                            .filter(t => t.type === 'Nhập' && t.maVatTu === vt.Ma_Vat_Tu && (!endDate || t.ngayLap <= endDate))
+                            .reduce((sum, t) => sum + t.quantity, 0);
+                            
+                        const totalXuat = transactionLogs
+                            .filter(t => t.type === 'Xuất' && t.maVatTu === vt.Ma_Vat_Tu && (!endDate || t.ngayLap <= endDate))
+                            .reduce((sum, t) => sum + t.quantity, 0);
+                            
+                        const totalHong = transactionLogs
+                            .filter(t => t.type === 'Hư hỏng' && t.maVatTu === vt.Ma_Vat_Tu && (!endDate || t.ngayLap <= endDate))
+                            .reduce((sum, t) => sum + t.quantity, 0);
+                        
+                        const calculatedStock = vt.Initial_Qty + totalNhap - totalXuat - totalHong;
+                        results.push({
+                            itemId: vt.Ma_Vat_Tu,
+                            itemName: vt.Ten_Vat_Tu,
+                            unit: vt.Ma_DVT_Co_Ban,
+                            quantity: calculatedStock,
+                            price: vt.Don_Gia_Gia_Dinh
+                        });
+                    }
+                });
+            } else {
+                const filteredTx = transactionLogs.filter(t => selectedSourceIds.has(t.phieuId));
+                
+                const aggregated = {};
+                filteredTx.forEach(t => {
+                    if (!aggregated[t.maVatTu]) {
+                        aggregated[t.maVatTu] = {
+                            quantity: 0,
+                            price: t.price
+                        };
+                    }
+                    aggregated[t.maVatTu].quantity += t.quantity;
+                });
+
+                Object.keys(aggregated).forEach(maVatTu => {
+                    const vt = mockVatTu.find(v => v.Ma_Vat_Tu === maVatTu);
+                    if (vt) {
+                        results.push({
+                            itemId: maVatTu,
+                            itemName: vt.Ten_Vat_Tu,
+                            unit: vt.Ma_DVT_Co_Ban,
+                            quantity: aggregated[maVatTu].quantity,
+                            price: aggregated[maVatTu].price
+                        });
+                    }
+                });
+            }
+
+            currentPreviewItems = results;
+            let totalVal = 0;
+
+            if (results.length === 0) {
+                previewTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="py-8 text-center text-slate-400 font-medium italic">
+                            Chưa chọn chứng từ nguồn hoặc không có vật tư tương ứng.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                previewTableBody.innerHTML = results.map(it => {
+                    const sum = it.quantity * it.price;
+                    totalVal += sum;
+                    return `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="py-3.5 px-6 font-semibold text-slate-500 font-mono">${it.itemId}</td>
+                            <td class="py-3.5 px-6 font-semibold text-slate-800">${it.itemName}</td>
+                            <td class="py-3.5 px-6 text-slate-550">${it.unit}</td>
+                            <td class="py-3.5 px-6 text-right font-bold text-slate-800">${it.quantity.toLocaleString()}</td>
+                            <td class="py-3.5 px-6 text-right font-medium text-slate-650">${it.price.toLocaleString()} ₫</td>
+                            <td class="py-3.5 px-6 text-right font-bold text-slate-900">${sum.toLocaleString()} ₫</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+            
+            previewTotalValue.textContent = totalVal.toLocaleString() + ' ₫';
+        }
+
+        // Bind retrieve trigger click listener
+        retrieveDataBtn.addEventListener('click', retrieveKeeperData);
+
+        // Bind reactive filter hide elements (forcing fresh retrieval on parameter change)
+        const hidePanelsOnInput = () => {
+            keeperDataPanel.classList.add('hidden');
+            keeperActionsBar.classList.add('hidden');
+            document.getElementById('preview-empty-warning').classList.add('hidden');
+        };
+        reportTypeSelect.addEventListener('change', hidePanelsOnInput);
+        startDateInput.addEventListener('change', () => {
+            validateDateRange();
+            hidePanelsOnInput();
+        });
+        endDateInput.addEventListener('change', () => {
+            validateDateRange();
+            hidePanelsOnInput();
+        });
+
+        // LUỒNG 2: Nhấn "Hủy bỏ" trước khi lập báo cáo thống kê
+        cancelReportBtn.addEventListener('click', () => {
+            if (confirm('Bạn có chắc muốn hủy bỏ các dữ liệu lập báo cáo hiện tại?')) {
+                currentPreviewItems = [];
+                selectedSourceIds.clear();
+                
+                // Hide data panel and action buttons
+                keeperDataPanel.classList.add('hidden');
+                keeperActionsBar.classList.add('hidden');
+                document.getElementById('preview-empty-warning').classList.add('hidden');
+                dateErrorMsg.classList.add('hidden');
+                
+                // Reset date inputs to default
+                const today = new Date();
+                const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+                startDateInput.value = firstDay.toISOString().split('T')[0];
+                endDateInput.value = today.toISOString().split('T')[0];
+                
+                startDateInput.classList.remove('border-rose-500', 'focus:border-rose-500');
+                endDateInput.classList.remove('border-rose-500', 'focus:border-rose-500');
+                
+                validateDateRange();
+                
+                showToast('Đã hủy bỏ và làm sạch biểu mẫu dữ liệu tạm thời.', 'info');
+            }
+        });
+
+        // Open detailed modal before generating report
+        previewReportDetailBtn.addEventListener('click', openReportDetailPreview);
+
+        function openReportDetailPreview() {
+            if (currentPreviewItems.length === 0) {
+                showToast('Không có dữ liệu vật tư được chọn để xem chi tiết!', 'error');
+                return;
+            }
+
+            const reportType = reportTypeSelect.value;
+            const user = getActiveUserSession();
+            
+            recheckInputBox.classList.add('hidden');
+            recheckTextarea.value = '';
+            recheckErrorMsg.classList.add('hidden');
+
+            detailTitle.textContent = `Xem chi tiết báo cáo thống kê trước khi lập`;
+            
+            // Paper invoice-like styling updates
+            document.getElementById('paper-report-title').textContent = reportType.toUpperCase();
+            document.getElementById('paper-report-id').textContent = 'Số báo cáo: [BẢN NHÁP]';
+            document.getElementById('paper-report-date').textContent = 'Ngày lập: ' + new Date().toISOString().split('T')[0];
+            
+            const startVal = startDateInput.value ? new Date(startDateInput.value).toLocaleDateString('vi-VN') : '';
+            const endVal = endDateInput.value ? new Date(endDateInput.value).toLocaleDateString('vi-VN') : '';
+            
+            if (reportType === 'Báo cáo Tồn kho') {
+                document.getElementById('paper-report-period').textContent = `Thời điểm báo cáo: Tính đến ngày ${endVal || new Date().toLocaleDateString('vi-VN')}`;
+            } else {
+                document.getElementById('paper-report-period').textContent = `Khoảng thời gian: Từ ngày ${startVal || 'N/A'} đến ngày ${endVal || 'N/A'}`;
+            }
+
+            document.getElementById('paper-creator').textContent = user.username || 'tam.thukho';
+            
+            // Creator Name Sign
+            const creatorName = user.roleMapping ? user.roleMapping.name : (user.name || 'Trần Minh Tâm');
+            document.getElementById('paper-creator-name').textContent = creatorName;
+
+            const paperStatusBadge = document.getElementById('paper-status-badge');
+            paperStatusBadge.innerHTML = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded border border-blue-200 uppercase font-bold text-[10px]">Bản Nháp</span>';
+            
+            document.getElementById('paper-watermark').textContent = 'BẢN NHÁP';
+            document.getElementById('approved-stamp').classList.add('hidden'); // Hide approved stamp on draft preview
+            
+            feedbackDisplayContainer.classList.add('hidden');
+            lockedStatusBanner.classList.add('hidden');
+            activeActionButtons.classList.remove('hidden');
+
+            // Hide Director buttons, Show Keeper submit button
+            approveReportBtn.classList.add('hidden');
+            recheckTriggerBtn.classList.add('hidden');
+            
+            let submitBtn = document.getElementById('keeper-submit-report-btn');
+            if (!submitBtn) {
+                submitBtn = document.createElement('button');
+                submitBtn.type = 'button';
+                submitBtn.id = 'keeper-submit-report-btn';
+                submitBtn.className = "px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[13px] transition-colors focus:outline-none shadow-sm flex items-center gap-1.5";
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-check text-xs"></i> Lập báo cáo thống kê';
+                
+                submitBtn.addEventListener('click', submitReportFromPreview);
+                activeActionButtons.appendChild(submitBtn);
+            }
+            submitBtn.classList.remove('hidden');
+
+            // Populate items table rows
+            let totalVal = 0;
+            detailTableBody.innerHTML = currentPreviewItems.map(it => {
+                const sum = it.quantity * it.price;
+                totalVal += sum;
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4 font-mono text-slate-500 font-semibold">${it.itemId}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${it.itemName}</td>
+                        <td class="py-3 px-4 text-slate-550">${it.unit}</td>
+                        <td class="py-3 px-4 text-right font-bold text-slate-800">${it.quantity.toLocaleString()}</td>
+                        <td class="py-3 px-4 text-right text-slate-650 font-medium">${it.price.toLocaleString()} ₫</td>
+                        <td class="py-3 px-4 text-right font-bold text-slate-900">${sum.toLocaleString()} ₫</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            detailTotalValue.textContent = totalVal.toLocaleString() + ' ₫';
+
+            // Generate analytical visuals
+            if (totalVal > 0) {
+                chartBarsContainer.innerHTML = currentPreviewItems.map(it => {
+                    const sum = it.quantity * it.price;
+                    const percent = ((sum / totalVal) * 100).toFixed(1);
+                    return `
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs font-semibold text-slate-700">
+                                <span>${it.itemName} (${it.itemId})</span>
+                                <span class="font-mono text-blue-600">${percent}% (${sum.toLocaleString()} ₫)</span>
+                            </div>
+                            <div class="w-full bg-slate-200/70 h-2.5 rounded-full overflow-hidden shadow-inner flex">
+                                <div class="bg-blue-650 h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                chartBarsContainer.innerHTML = '<p class="text-xs text-slate-400 italic">Không có dữ liệu biểu đồ phân tích tỷ trọng.</p>';
+            }
+
+            detailModal.classList.add('open');
+        }
+
+        // Official submit and save to LocalStorage
+        function submitReportFromPreview() {
+            if (currentPreviewItems.length === 0) return;
+
+            const reportType = reportTypeSelect.value;
+            const user = getActiveUserSession();
+            const log = getReportsLog();
+
+            const newReport = {
+                reportId: generateNextReportId(log),
+                reportType: reportType,
+                creator: user.username || 'tam.thukho',
+                createdAt: new Date().toISOString().split('T')[0],
+                status: 'Chờ phê duyệt',
+                feedback: '',
+                items: JSON.parse(JSON.stringify(currentPreviewItems))
+            };
+
+            log.push(newReport);
+            saveReportsLog(log);
+
+            showToast("Đã lập báo cáo thành công", 'success');
+            
+            // Clean Keeper workspace preview
+            currentPreviewItems = [];
+            selectedSourceIds.clear();
+            
+            keeperDataPanel.classList.add('hidden');
+            keeperActionsBar.classList.add('hidden');
+            document.getElementById('preview-empty-warning').classList.add('hidden');
+            
+            detailModal.classList.remove('open');
+            renderKeeperReportsList();
+        }
+
+        // ==================== GIÁM ĐỐC / ADMIN WORKFLOW ====================
+        function renderDirectorWorkspace() {
+            const log = getReportsLog();
+            
+            const searchInput = document.getElementById('director-search-input');
+            const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const typeFilter = document.getElementById('director-filter-type') ? document.getElementById('director-filter-type').value : '';
+            const statusFilter = document.getElementById('director-filter-status') ? document.getElementById('director-filter-status').value : '';
+            
+            let filtered = [...log];
+            if (searchQuery) {
+                filtered = filtered.filter(rep => rep.reportId.toLowerCase().includes(searchQuery));
+            }
+            if (typeFilter) {
+                filtered = filtered.filter(rep => rep.reportType === typeFilter);
+            }
+            if (statusFilter) {
+                filtered = filtered.filter(rep => rep.status === statusFilter);
+            }
+            
+            if (filtered.length === 0) {
+                reportsTableBody.innerHTML = '';
+                reportsEmptyState.classList.remove('hidden');
+            } else {
+                reportsEmptyState.classList.add('hidden');
+                // Pending reports sorted first, then reportId descending
+                const sorted = [...filtered].sort((a, b) => {
+                    if (a.status === 'Chờ phê duyệt' && b.status !== 'Chờ phê duyệt') return -1;
+                    if (a.status !== 'Chờ phê duyệt' && b.status === 'Chờ phê duyệt') return 1;
+                    return b.reportId.localeCompare(a.reportId);
+                });
+                
+                reportsTableBody.innerHTML = sorted.map(rep => {
+                    let statusBadge = '';
+                    switch(rep.status) {
+                        case 'Chờ phê duyệt':
+                            statusBadge = '<span class="bg-purple-105 text-purple-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-purple-200 uppercase inline-flex items-center gap-1.5"><i class="fa-regular fa-clock text-[9px]"></i> Chờ phê duyệt</span>';
+                            break;
+                        case 'Đã phê duyệt':
+                            statusBadge = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-emerald-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-check text-[9px]"></i> Đã duyệt</span>';
+                            break;
+                        case 'Yêu cầu chỉnh sửa':
+                            statusBadge = '<span class="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-amber-250 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Cần sửa lại</span>';
+                            break;
+                    }
+
+                    const feedbackDisplay = rep.feedback ? `<span class="text-slate-500 font-medium italic block max-w-xs truncate" title="${rep.feedback}">${rep.feedback}</span>` : '<span class="text-slate-400 italic">Không có</span>';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="py-4 px-6 font-semibold text-slate-500 font-mono">${rep.reportId}</td>
+                            <td class="py-4 px-6 font-semibold text-slate-800">${rep.reportType}</td>
+                            <td class="py-4 px-6 text-slate-650 font-medium">${rep.creator}</td>
+                            <td class="py-4 px-6 text-slate-550 font-mono">${rep.createdAt}</td>
+                            <td class="py-4 px-6">${statusBadge}</td>
+                            <td class="py-4 px-6">${feedbackDisplay}</td>
+                            <td class="py-4 px-6 text-right">
+                                <button type="button" onclick="openReportDetail('${rep.reportId}')" class="text-blue-600 hover:text-blue-800 font-bold transition-colors focus:outline-none">
+                                    Xem báo cáo
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        // ==================== INTERACTIVE DETAIL POPUP OVERLAY ====================
+        function openReportDetail(reportId) {
+            const log = getReportsLog();
+            activeReport = log.find(r => r.reportId === reportId);
+            if (!activeReport) return;
+
+            // Reset modal feedback input fields
+            recheckInputBox.classList.add('hidden');
+            recheckTextarea.value = '';
+            recheckErrorMsg.classList.add('hidden');
+            recheckTextarea.classList.remove('border-rose-500', 'focus:border-rose-500');
+
+            // Metadata bindings
+            detailTitle.textContent = `Chi tiết báo cáo thống kê ${activeReport.reportId}`;
+            
+            // Paper invoice-like styling updates
+            document.getElementById('paper-report-title').textContent = activeReport.reportType.toUpperCase();
+            document.getElementById('paper-report-id').textContent = 'Số báo cáo: ' + activeReport.reportId;
+            document.getElementById('paper-report-date').textContent = 'Ngày lập: ' + activeReport.createdAt;
+            document.getElementById('paper-report-period').textContent = 'Thời điểm lập: ' + activeReport.createdAt;
+            document.getElementById('paper-creator').textContent = activeReport.creator;
+            
+            // Creator Name Sign
+            const empList = JSON.parse(localStorage.getItem('ttcn_employees') || '[]');
+            const creatorEmp = empList.find(e => e.username === activeReport.creator);
+            const creatorFullName = creatorEmp ? creatorEmp.fullName : activeReport.creator;
+            document.getElementById('paper-creator-name').textContent = creatorFullName;
+
+            // Status Badge & Watermark
+            let statusHtml = '';
+            switch(activeReport.status) {
+                case 'Chờ phê duyệt':
+                    statusHtml = '<span class="bg-purple-105 text-purple-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-purple-200 uppercase inline-flex items-center gap-1.5"><i class="fa-regular fa-clock text-[9px]"></i> Chờ phê duyệt</span>';
+                    break;
+                case 'Đã phê duyệt':
+                    statusHtml = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-emerald-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-check text-[9px]"></i> Đã phê duyệt</span>';
+                    break;
+                case 'Yêu cầu chỉnh sửa':
+                    statusHtml = '<span class="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-amber-250 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Cần sửa lại</span>';
+                    break;
+            }
+            document.getElementById('paper-status-badge').innerHTML = statusHtml;
+            document.getElementById('paper-watermark').textContent = activeReport.status.toUpperCase();
+
+            // Toggle approved stamp
+            const stamp = document.getElementById('approved-stamp');
+            if (activeReport.status === 'Đã phê duyệt') {
+                stamp.classList.remove('hidden');
+            } else {
+                stamp.classList.add('hidden');
+            }
+
+            // Feedback display
+            if (activeReport.feedback) {
+                feedbackDisplayText.textContent = activeReport.feedback;
+                feedbackDisplayContainer.classList.remove('hidden');
+            } else {
+                feedbackDisplayContainer.classList.add('hidden');
+            }
+
+            const user = getActiveUserSession();
+            const isDirectorOrAdmin = user.role === 'Giám đốc' || user.role === 'Admin';
+
+            if (!isDirectorOrAdmin) {
+                // If Keeper is viewing, hide all actions except Close.
+                lockedStatusBanner.classList.add('hidden');
+                activeActionButtons.classList.add('hidden');
+            } else {
+                // Director or Admin view
+                if (activeReport.status !== 'Chờ phê duyệt') {
+                    lockedStatusBanner.classList.remove('hidden');
+                    activeActionButtons.classList.add('hidden');
+                } else {
+                    lockedStatusBanner.classList.add('hidden');
+                    activeActionButtons.classList.remove('hidden');
+                    
+                    // Show Director buttons
+                    approveReportBtn.classList.remove('hidden');
+                    recheckTriggerBtn.classList.remove('hidden');
+                    
+                    // Hide Keeper draft submit button
+                    const submitBtn = document.getElementById('keeper-submit-report-btn');
+                    if (submitBtn) submitBtn.classList.add('hidden');
+                }
+            }
+
+            // Populate table rows
+            let totalVal = 0;
+            const items = activeReport.items || [];
+            
+            detailTableBody.innerHTML = items.map(it => {
+                const sum = it.quantity * it.price;
+                totalVal += sum;
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4 font-mono text-slate-500 font-semibold">${it.itemId}</td>
+                        <td class="py-3 px-4 font-medium text-slate-800">${it.itemName}</td>
+                        <td class="py-3 px-4 text-slate-550">${it.unit}</td>
+                        <td class="py-3 px-4 text-right font-bold text-slate-800">${it.quantity.toLocaleString()}</td>
+                        <td class="py-3 px-4 text-right text-slate-650 font-medium">${it.price.toLocaleString()} ₫</td>
+                        <td class="py-3 px-4 text-right font-bold text-slate-900">${sum.toLocaleString()} ₫</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            detailTotalValue.textContent = totalVal.toLocaleString() + ' ₫';
+
+            // Generate analytical visual bar proportion charts (Pure Tailwind stacked percentages)
+            if (totalVal > 0) {
+                chartBarsContainer.innerHTML = items.map(it => {
+                    const sum = it.quantity * it.price;
+                    const percent = ((sum / totalVal) * 100).toFixed(1);
+                    return `
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs font-semibold text-slate-700">
+                                <span>${it.itemName} (${it.itemId})</span>
+                                <span class="font-mono text-blue-600">${percent}% (${sum.toLocaleString()} ₫)</span>
+                            </div>
+                            <div class="w-full bg-slate-200/70 h-2.5 rounded-full overflow-hidden shadow-inner flex">
+                                <div class="bg-blue-650 h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                chartBarsContainer.innerHTML = '<p class="text-xs text-slate-400 italic">Không có dữ liệu biểu đồ phân tích tỷ trọng.</p>';
+            }
+
+            detailModal.classList.add('open');
+        }
+
+        // Close detail modal triggers
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                detailModal.classList.remove('open');
+                activeReport = null;
+            });
+        });
+
+        // Click outside modal content to close
+        detailModal.addEventListener('click', (e) => {
+            if (e.target === detailModal) {
+                detailModal.classList.remove('open');
+                activeReport = null;
+            }
+        });
+
+        // 1. APPROVE ACTION
+        approveReportBtn.addEventListener('click', () => {
+            if (!activeReport) return;
+            
+            let log = getReportsLog();
+            const idx = log.findIndex(r => r.reportId === activeReport.reportId);
+            
+            if (idx !== -1) {
+                log[idx].status = 'Đã phê duyệt';
+                log[idx].feedback = ''; // Clear re-check feed
+                saveReportsLog(log);
+                
+                showToast("Phê duyệt báo cáo thành công", 'success');
+                renderDirectorWorkspace();
+                detailModal.classList.remove('open');
+                activeReport = null;
+            }
+        });
+
+        // 2. RE-CHECK SUB-ACTION VIEW CONTROLLERS (Notifications injected to match sequence flow)
+        recheckTriggerBtn.addEventListener('click', () => {
+            recheckInputBox.classList.remove('hidden');
+            recheckTextarea.focus();
+            approveReportBtn.classList.add('hidden');
+            recheckTriggerBtn.classList.add('hidden');
+        });
+
+        cancelRecheckBtn.addEventListener('click', () => {
+            recheckInputBox.classList.add('hidden');
+            recheckTextarea.value = '';
+            recheckErrorMsg.classList.add('hidden');
+            recheckTextarea.classList.remove('border-rose-500', 'focus:border-rose-500');
+            approveReportBtn.classList.remove('hidden');
+            recheckTriggerBtn.classList.remove('hidden');
+        });
+
+        confirmRecheckBtn.addEventListener('click', () => {
+            if (!activeReport) return;
+            const feedbackText = recheckTextarea.value.trim();
+            
+            if (!feedbackText) {
+                recheckTextarea.classList.add('border-rose-500', 'focus:border-rose-500');
+                recheckErrorMsg.classList.remove('hidden');
+                return;
+            }
+
+            let log = getReportsLog();
+            const idx = log.findIndex(r => r.reportId === activeReport.reportId);
+            
+            if (idx !== -1) {
+                log[idx].status = 'Yêu cầu chỉnh sửa';
+                log[idx].feedback = feedbackText;
+                saveReportsLog(log);
+
+                // Sequence Diagram Step: "Tự động bắn thông báo (Notification) rà soát lại cho Thủ kho"
+                try {
+                    const notifyLog = JSON.parse(localStorage.getItem('wms_notifications') || '[]');
+                    notifyLog.push({
+                        id: 'NTF' + Date.now(),
+                        message: `Báo cáo ${activeReport.reportId} bị yêu cầu chỉnh sửa lại. Lý do: "${feedbackText}"`,
+                        recipient: activeReport.creator,
+                        createdAt: new Date().toLocaleTimeString() + ' ' + new Date().toLocaleDateString(),
+                        read: false
+                    });
+                    localStorage.setItem('wms_notifications', JSON.stringify(notifyLog));
+                } catch(err) {
+                    console.error('Error logging keeper notifications:', err);
+                }
+
+                showToast('Đã chuyển trạng thái thành công', 'success');
+                renderDirectorWorkspace();
+                detailModal.classList.remove('open');
+                activeReport = null;
+            }
+        });
+
+        function renderKeeperReportsList() {
+            const tbody = document.getElementById('keeper-reports-table-body');
+            const emptyState = document.getElementById('keeper-reports-empty-state');
+            if (!tbody) return;
+
+            const user = getActiveUserSession();
+            const log = getReportsLog();
+            
+            // Filter reports by current creator or default keeper
+            const activeUser = user.username || 'tam.thukho';
+            const userReports = log.filter(r => r.creator === 'tam.thukho' || r.creator === activeUser);
+
+            const searchInput = document.getElementById('keeper-search-input');
+            const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            const typeFilter = document.getElementById('keeper-filter-type') ? document.getElementById('keeper-filter-type').value : '';
+            const statusFilter = document.getElementById('keeper-filter-status') ? document.getElementById('keeper-filter-status').value : '';
+            
+            let filtered = [...userReports];
+            if (searchQuery) {
+                filtered = filtered.filter(rep => rep.reportId.toLowerCase().includes(searchQuery));
+            }
+            if (typeFilter) {
+                filtered = filtered.filter(rep => rep.reportType === typeFilter);
+            }
+            if (statusFilter) {
+                filtered = filtered.filter(rep => rep.status === statusFilter);
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                // Sort by reportId descending
+                const sorted = [...filtered].sort((a, b) => b.reportId.localeCompare(a.reportId));
+                
+                tbody.innerHTML = sorted.map(rep => {
+                    let statusBadge = '';
+                    switch(rep.status) {
+                        case 'Chờ phê duyệt':
+                            statusBadge = '<span class="bg-purple-105 text-purple-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-purple-200 uppercase inline-flex items-center gap-1.5"><i class="fa-regular fa-clock text-[9px]"></i> Chờ phê duyệt</span>';
+                            break;
+                        case 'Đã phê duyệt':
+                            statusBadge = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-emerald-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-check text-[9px]"></i> Đã duyệt</span>';
+                            break;
+                        case 'Yêu cầu chỉnh sửa':
+                            statusBadge = '<span class="bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-amber-250 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-[9px]"></i> Cần sửa lại</span>';
+                            break;
+                    }
+
+                    const feedbackDisplay = rep.feedback ? `<span class="text-amber-705 font-bold block max-w-xs truncate" title="${rep.feedback}">${rep.feedback}</span>` : '<span class="text-slate-400 italic">Chưa có ý kiến</span>';
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="py-4 px-6 font-semibold text-slate-550 font-mono">${rep.reportId}</td>
+                            <td class="py-4 px-6 font-semibold text-slate-800">${rep.reportType}</td>
+                            <td class="py-4 px-6 text-slate-550 font-mono">${rep.createdAt}</td>
+                            <td class="py-4 px-6">${statusBadge}</td>
+                            <td class="py-4 px-6">${feedbackDisplay}</td>
+                            <td class="py-4 px-6 text-right">
+                                <button type="button" onclick="openReportDetail('${rep.reportId}')" class="text-blue-600 hover:text-blue-800 font-bold transition-colors focus:outline-none">
+                                    Xem báo cáo
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        function renderKeeperNotifications() {
+            const container = document.getElementById('keeper-notifications-container');
+            if (!container) return;
+
+            const user = getActiveUserSession();
+            let notifications = [];
+            try {
+                notifications = JSON.parse(localStorage.getItem('wms_notifications') || '[]');
+            } catch(e) {}
+
+            const activeUser = user.username || 'tam.thukho';
+            const userNotifs = notifications.filter(n => (n.recipient === 'tam.thukho' || n.recipient === activeUser) && n.read === false);
+
+            if (userNotifs.length === 0) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = userNotifs.map(n => `
+                <div class="bg-amber-50 border border-amber-200 text-amber-900 rounded-xl p-4 shadow-sm flex justify-between items-start gap-4">
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-750 flex items-center justify-center flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-bell text-sm text-amber-600"></i>
+                        </div>
+                        <div class="text-left">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-amber-800 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> Yêu cầu rà soát báo cáo
+                            </h4>
+                            <p class="text-xs font-semibold text-amber-700 mt-1">${n.message}</p>
+                            <span class="text-[10px] text-amber-550 font-semibold block mt-1.5 font-mono">Thời gian: ${n.createdAt}</span>
+                        </div>
+                    </div>
+                    <button type="button" onclick="dismissNotification('${n.id}')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg p-1 transition-colors focus:outline-none flex items-center justify-center" title="Đánh dấu đã đọc">
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function dismissNotification(notifId) {
+            let notifications = [];
+            try {
+                notifications = JSON.parse(localStorage.getItem('wms_notifications') || '[]');
+            } catch(e) {}
+
+            const idx = notifications.findIndex(n => n.id === notifId);
+            if (idx !== -1) {
+                notifications[idx].read = true;
+                localStorage.setItem('wms_notifications', JSON.stringify(notifications));
+                renderKeeperNotifications();
+                showToast("Đã đánh dấu thông báo là đã đọc.", 'info');
+            }
+        }
+
+        window.dismissNotification = dismissNotification;
+
+        // Toast message engine
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const typeConfig = {
+                info: {
+                    bg: 'bg-slate-900 text-white border border-slate-700',
+                    icon: '<i class="fa-solid fa-circle-info text-blue-450"></i>',
+                    title: 'Hệ Thống'
+                },
+                success: {
+                    bg: 'bg-emerald-950 text-white border border-emerald-700',
+                    icon: '<i class="fa-solid fa-circle-check text-emerald-400"></i>',
+                    title: 'Thành Công'
+                },
+                error: {
+                    bg: 'bg-rose-950 text-white border border-rose-700',
+                    icon: '<i class="fa-solid fa-circle-xmark text-rose-450"></i>',
+                    title: 'Cảnh Báo'
+                }
+            };
+
+            const cfg = typeConfig[type] || typeConfig.info;
+
+            toast.className = `p-4 px-4.5 rounded-xl shadow-2xl flex gap-3 transform translate-y-[-10px] opacity-0 transition-all duration-300 ease-out ${cfg.bg}`;
+            toast.innerHTML = `
+                <div class="flex-shrink-0 mt-0.5">${cfg.icon}</div>
+                <div class="flex-grow space-y-0.5">
+                    <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-350 text-left">${cfg.title}</h4>
+                    <p class="text-xs font-semibold text-slate-100 text-left leading-normal">${message}</p>
+                </div>
+                <button class="flex-shrink-0 text-slate-400 hover:text-white transition-colors h-fit self-start ml-2 focus:outline-none">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-[-10px]', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+
+            const dismiss = () => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-10px]', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            };
+
+            toast.querySelector('button').addEventListener('click', dismiss);
+            setTimeout(dismiss, 4500);
+        }
+
+        // Bootstrap on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            getReportsLog(); // seed mockup databases
+            
+            // Seed default notifications for BC003 and BC005 if empty or outdated
+            try {
+                const existingNotifs = localStorage.getItem('wms_notifications');
+                if (!existingNotifs || JSON.parse(existingNotifs).length < 2 || !JSON.parse(existingNotifs).some(n => n.id === 'NTF_SEED_002')) {
+                    const defaultNotifications = [
+                        {
+                            id: 'NTF_SEED_001',
+                            message: 'Báo cáo BC003 bị yêu cầu chỉnh sửa lại. Lý do: "Số lượng vật tư lỗi hư hỏng chưa khớp với biên bản kiểm kê hao hụt thực tế. Cần rà soát lại."',
+                            recipient: 'tam.thukho',
+                            createdAt: '10:30 08/06/2026',
+                            read: false
+                        },
+                        {
+                            id: 'NTF_SEED_002',
+                            message: 'Báo cáo BC005 bị yêu cầu chỉnh sửa lại. Lý do: "Đơn giá nhập của Sàn gỗ Walnut ở phiếu PN002 bị lệch so với hợp đồng mua hàng (240k vs 250k). Đề nghị kiểm tra lại chứng từ gốc."',
+                            recipient: 'tam.thukho',
+                            createdAt: '14:15 05/06/2026',
+                            read: false
+                        }
+                    ];
+                    localStorage.setItem('wms_notifications', JSON.stringify(defaultNotifications));
+                }
+            } catch(e) {}
+            
+            initWorkspaces();
+
+            // Bind search inputs
+            const keeperSearch = document.getElementById('keeper-search-input');
+            if (keeperSearch) {
+                keeperSearch.addEventListener('input', renderKeeperReportsList);
+            }
+            const directorSearch = document.getElementById('director-search-input');
+            if (directorSearch) {
+                directorSearch.addEventListener('input', renderDirectorWorkspace);
+            }
+
+            // Bind filter dropdowns
+            const keeperFilterType = document.getElementById('keeper-filter-type');
+            if (keeperFilterType) {
+                keeperFilterType.addEventListener('change', renderKeeperReportsList);
+            }
+            const keeperFilterStatus = document.getElementById('keeper-filter-status');
+            if (keeperFilterStatus) {
+                keeperFilterStatus.addEventListener('change', renderKeeperReportsList);
+            }
+            const directorFilterType = document.getElementById('director-filter-type');
+            if (directorFilterType) {
+                directorFilterType.addEventListener('change', renderDirectorWorkspace);
+            }
+            const directorFilterStatus = document.getElementById('director-filter-status');
+            if (directorFilterStatus) {
+                directorFilterStatus.addEventListener('change', renderDirectorWorkspace);
+            }
+
+            // Bind reset buttons
+            const keeperResetBtn = document.getElementById('keeper-reset-filter-btn');
+            if (keeperResetBtn) {
+                keeperResetBtn.addEventListener('click', () => {
+                    const searchInput = document.getElementById('keeper-search-input');
+                    const typeSelect = document.getElementById('keeper-filter-type');
+                    const statusSelect = document.getElementById('keeper-filter-status');
+                    if (searchInput) searchInput.value = '';
+                    if (typeSelect) typeSelect.value = '';
+                    if (statusSelect) statusSelect.value = '';
+                    renderKeeperReportsList();
+                    showToast('Đã làm mới bộ lọc danh sách báo cáo.', 'info');
+                });
+            }
+
+            const directorResetBtn = document.getElementById('director-reset-filter-btn');
+            if (directorResetBtn) {
+                directorResetBtn.addEventListener('click', () => {
+                    const searchInput = document.getElementById('director-search-input');
+                    const typeSelect = document.getElementById('director-filter-type');
+                    const statusSelect = document.getElementById('director-filter-status');
+                    if (searchInput) searchInput.value = '';
+                    if (typeSelect) typeSelect.value = '';
+                    if (statusSelect) statusSelect.value = '';
+                    renderDirectorWorkspace();
+                    showToast('Đã làm mới bộ lọc danh sách báo cáo.', 'info');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

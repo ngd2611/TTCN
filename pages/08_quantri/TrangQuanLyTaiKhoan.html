@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý tài khoản - Trường Thọ WMS</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/global.css">
+
+    <style>
+        /* Custom Modal Overlay Transitions */
+        .modal-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease-out;
+        }
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            transform: scale(0.97);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .modal-overlay.open .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-[#F4F7F9] text-slate-800 min-h-screen">
+
+    <!-- Workspace Main Section (No topbar/header, handled by shared layout) -->
+    <main class="p-6 space-y-6">
+        
+        <!-- Unified Positions Summary Bar -->
+        <div class="bg-white p-4.5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
+            <div>
+                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-users-gear text-slate-400"></i> Thống kê nhân sự theo vai trò
+                </h4>
+                <p class="text-[11px] text-slate-400 mt-0.5">Tổng số nhân sự hoạt động phân chia theo chức vụ trong kho.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 items-center w-full md:w-auto">
+                <div class="bg-slate-50 border border-slate-150 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">Admin:</span>
+                    <span id="role-stat-admin" class="text-xs font-black text-slate-800 font-mono">0</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-150 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">Giám đốc:</span>
+                    <span id="role-stat-giamdoc" class="text-xs font-black text-slate-800 font-mono">0</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-150 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">Thủ kho:</span>
+                    <span id="role-stat-thukho" class="text-xs font-black text-slate-800 font-mono">0</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-150 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">Kế toán:</span>
+                    <span id="role-stat-ketoan" class="text-xs font-black text-slate-800 font-mono">0</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-150 rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase">Kinh doanh:</span>
+                    <span id="role-stat-kinhdoanh" class="text-xs font-black text-slate-800 font-mono">0</span>
+                </div>
+                <div class="bg-blue-50/70 border border-blue-150 rounded-lg px-3 py-1 flex items-center gap-1.5 md:ml-2">
+                    <i class="fa-solid fa-users text-blue-500 text-[10px]"></i>
+                    <span class="text-[11px] font-bold text-blue-700 uppercase">Tổng cộng:</span>
+                    <span id="role-stat-total" class="text-xs font-black text-blue-800 font-mono">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Grid Section -->
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            
+            <!-- Filter & Search Toolbar -->
+            <div class="p-4 border-b border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <!-- Search Input -->
+                    <div class="relative w-full sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
+                        <input type="text" id="table-search" placeholder="Tìm kiếm tên, email, tên đăng nhập..." class="w-full bg-white border border-slate-300 text-[13px] rounded-lg pl-9 pr-4 py-2 focus:outline-none focus:border-blue-500 transition-colors">
+                    </div>
+
+                    <!-- Role Dropdown Selector -->
+                    <div class="relative w-full sm:w-48">
+                        <select id="role-filter" class="w-full bg-white border border-slate-300 text-[13px] rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 transition-colors cursor-pointer font-medium">
+                            <option value="Tất cả">Lọc vai trò (Tất cả)</option>
+                            <option value="Admin">Admin</option>
+                            <option value="Thủ kho">Thủ kho</option>
+                            <option value="Kế toán">Kế toán</option>
+                            <option value="Kinh doanh">Kinh doanh</option>
+                            <option value="Giám đốc">Giám đốc</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Add Button -->
+                <button type="button" id="open-add-btn" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-[13px] transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-user-plus text-xs"></i> Tạo tài khoản
+                </button>
+            </div>
+
+            <!-- Employee List Table -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-[13px] text-left border-collapse">
+                    <thead>
+                        <tr class="bg-white border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+                            <th class="py-4 px-6">Mã nhân viên</th>
+                            <th class="py-4 px-6">Nhân viên</th>
+                            <th class="py-4 px-6">Thông tin tài khoản</th>
+                            <th class="py-4 px-6">Vai trò hệ thống</th>
+                            <th class="py-4 px-6">Số điện thoại</th>
+                            <th class="py-4 px-6 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employee-table-body" class="divide-y divide-slate-200">
+                        <!-- Loaded dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="table-empty-state" class="hidden py-16 flex flex-col items-center justify-center text-slate-400 bg-white">
+                <i class="fa-regular fa-folder-open text-4xl mb-3 text-slate-350"></i>
+                <p class="text-sm font-semibold">Không tìm thấy tài khoản nhân viên nào khớp.</p>
+            </div>
+            
+            <!-- Pagination Controls -->
+            <div class="px-6 py-4 bg-white border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p id="table-pagination-info" class="text-[12px] text-slate-500">Hiển thị 1 - 4 trên tổng số 4 nhân viên</p>
+                <div class="flex space-x-1">
+                    <button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50 transition-colors"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded bg-blue-600 text-white text-[12px] font-bold">1</button>
+                    <button class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50 transition-colors"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+
+    <!-- MOCKUP POPUP OVERLAY MODALS -->
+
+    <!-- 1. POPUP: TẠO TÀI KHOẢN (Create Modal) -->
+    <div id="add-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 backdrop-blur-sm p-4">
+        <div class="modal-content bg-white w-full max-w-lg rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus text-slate-700"></i>
+                    <h3 class="text-sm font-bold text-slate-800">Tạo tài khoản</h3>
+                </div>
+                <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-650 transition-colors focus:outline-none">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form Fields -->
+            <form id="add-form" class="flex flex-col flex-grow overflow-hidden" novalidate>
+                <div class="p-6 overflow-y-auto space-y-4 flex-grow">
+                    
+                    <!-- ID (Disabled/Read-only) -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider font-semibold">Mã tài khoản</label>
+                        <input type="text" placeholder="[Mã tự động sinh]" disabled class="w-full px-3 py-2 bg-slate-100 border border-slate-200 text-slate-500 rounded-lg text-[13px] cursor-not-allowed font-medium">
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label for="add-fullName" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Họ và tên <span class="text-rose-500">*</span></label>
+                        <input type="text" id="add-fullName" placeholder="Nhập họ và tên" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Role Dropdown -->
+                    <div>
+                        <label for="add-role" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Chức vụ / Phân quyền <span class="text-rose-500">*</span></label>
+                        <select id="add-role" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium cursor-pointer">
+                            <option value="">-- Chọn chức vụ --</option>
+                            <option value="Thủ kho">Thủ kho</option>
+                            <option value="Kế toán">Kế toán</option>
+                            <option value="Kinh doanh">Kinh doanh</option>
+                            <option value="Giám đốc">Giám đốc</option>
+                        </select>
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Username -->
+                    <div>
+                        <label for="add-username" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Tên đăng nhập <span class="text-rose-500">*</span></label>
+                        <input type="text" id="add-username" placeholder="Nhập tên đăng nhập" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="add-phone" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Số điện thoại <span class="text-rose-500">*</span></label>
+                        <input type="text" id="add-phone" placeholder="Nhập số điện thoại" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="add-email" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Email <span class="text-rose-500">*</span></label>
+                        <input type="email" id="add-email" placeholder="example@truongtho.com" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Password Fields -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="add-password" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Mật khẩu <span class="text-rose-500">*</span></label>
+                            <input type="password" id="add-password" placeholder="Nhập mật khẩu" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                            <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                        </div>
+                        <div>
+                            <label for="add-confirmPassword" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Nhập lại mật khẩu <span class="text-rose-500">*</span></label>
+                            <input type="password" id="add-confirmPassword" placeholder="Xác nhận mật khẩu" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                            <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 flex-shrink-0">
+                    <button type="button" class="close-modal-btn px-4 py-2 rounded-lg border border-slate-350 text-slate-650 font-medium text-[13px] hover:bg-slate-100 transition-colors focus:outline-none">
+                        Hủy
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[13px] transition-colors focus:outline-none shadow-sm">
+                        Tạo tài khoản
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. POPUP: SỬA TÀI KHOẢN (Update Modal) -->
+    <div id="edit-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 backdrop-blur-sm p-4">
+        <div class="modal-content bg-white w-full max-w-lg rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-user-pen text-slate-700"></i>
+                    <h3 class="text-sm font-bold text-slate-800">Chỉnh sửa tài khoản</h3>
+                </div>
+                <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-650 transition-colors focus:outline-none">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Form Fields -->
+            <form id="edit-form" class="flex flex-col flex-grow overflow-hidden" novalidate>
+                <div class="p-6 overflow-y-auto space-y-4 flex-grow">
+                    
+                    <!-- ID (Read-only) -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Mã tài khoản</label>
+                        <input type="text" id="edit-id" readonly class="w-full px-3 py-2 bg-slate-100 border border-slate-200 text-slate-500 rounded-lg text-[13px] cursor-not-allowed select-none font-medium">
+                    </div>
+
+                    <!-- Username (Editable) -->
+                    <div>
+                        <label for="edit-username" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Tên đăng nhập <span class="text-rose-500">*</span></label>
+                        <input type="text" id="edit-username" placeholder="Nhập tên đăng nhập" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label for="edit-fullName" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Họ và tên <span class="text-rose-500">*</span></label>
+                        <input type="text" id="edit-fullName" placeholder="Nhập họ và tên" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium font-outfit">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Role Dropdown -->
+                    <div>
+                        <label for="edit-role" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Chức vụ / Phân quyền <span class="text-rose-500">*</span></label>
+                        <select id="edit-role" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium cursor-pointer">
+                            <option value="Thủ kho">Thủ kho</option>
+                            <option value="Kế toán">Kế toán</option>
+                            <option value="Kinh doanh">Kinh doanh</option>
+                            <option value="Giám đốc">Giám đốc</option>
+                        </select>
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div>
+                        <label for="edit-phone" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Số điện thoại <span class="text-rose-500">*</span></label>
+                        <input type="text" id="edit-phone" placeholder="Nhập số điện thoại" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="edit-email" class="block text-[11px] font-bold text-slate-500 uppercase mb-1 tracking-wider">Email <span class="text-rose-500">*</span></label>
+                        <input type="email" id="edit-email" placeholder="example@truongtho.com" class="w-full px-3 py-2 bg-white border border-slate-300 text-slate-800 rounded-lg text-[13px] focus:outline-none focus:border-blue-500 transition-colors font-medium">
+                        <span class="error-msg text-rose-550 text-[11px] mt-1 hidden items-center gap-1 font-semibold"></span>
+                    </div>
+                </div>
+
+                <!-- Action Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3 flex-shrink-0">
+                    <button type="button" class="close-modal-btn px-4 py-2 rounded-lg border border-slate-350 text-slate-650 font-medium text-[13px] hover:bg-slate-100 transition-colors focus:outline-none">
+                        Hủy
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[13px] transition-colors focus:outline-none shadow-sm">
+                        Cập nhật
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. POPUP: XÓA TÀI KHOẢN (Delete Confirmation Modal) -->
+    <div id="delete-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 backdrop-blur-sm p-4">
+        <div class="modal-content bg-white w-full max-w-md rounded-xl shadow-xl border border-slate-200 overflow-hidden flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-slate-200 bg-rose-50/20 flex justify-between items-center">
+                <div class="flex items-center gap-2 text-rose-600">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3 class="text-[13px] font-bold uppercase tracking-wider">Xác nhận thao tác</h3>
+                </div>
+                <button type="button" class="close-modal-btn text-slate-400 hover:text-slate-650 transition-colors focus:outline-none">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content & Constraints Warnings -->
+            <div class="p-6 text-center space-y-4">
+                <div id="delete-icon-wrapper" class="w-12 h-12 bg-rose-100 text-rose-650 rounded-full flex items-center justify-center mx-auto text-lg shadow-inner">
+                    <i class="fa-regular fa-trash-can"></i>
+                </div>
+                
+                <!-- Normal Prompt -->
+                <p id="delete-modal-text" class="text-[13px] font-semibold text-slate-600 leading-relaxed">
+                    Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này không thể hoàn tác.
+                </p>
+
+                <!-- Self Deletion Rejection Warning -->
+                <div id="delete-alert-box" class="hidden bg-rose-50 border border-rose-200 p-4 rounded-xl text-left space-y-1.5">
+                    <div class="flex items-center gap-2 text-rose-700 font-bold text-xs">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        <span>Thao tác bị từ chối</span>
+                    </div>
+                    <p class="text-xs font-bold text-rose-600 leading-relaxed">
+                        Hệ thống từ chối thao tác: Bạn không thể tự xóa chính tài khoản của mình đang đăng nhập!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Action Footer -->
+            <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+                <button type="button" class="close-modal-btn px-4 py-2 rounded-lg border border-slate-350 text-slate-650 font-medium text-[13px] hover:bg-slate-100 transition-colors focus:outline-none">
+                    Hủy
+                </button>
+                <button type="button" id="confirm-delete-btn" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-[13px] transition-colors focus:outline-none shadow-sm">
+                    Đồng ý
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-[90%] sm:max-w-md"></div>
+
+    <!-- MOCKUP CORE JAVASCRIPT -->
+    <script>
+        const STORAGE_KEY = 'ttcn_employees';
+
+        function getCurrentUsername() {
+            try {
+                const session = localStorage.getItem('ttcn_user_session') || localStorage.getItem('user_session');
+                if (session) {
+                    const parsed = JSON.parse(session);
+                    if (parsed && parsed.username) return parsed.username;
+                }
+            } catch (e) {}
+            return 'admin'; // Fallback default username
+        }
+
+        // Seeding database list (mockup engine inside LocalStorage - Seeding 8 realistic items)
+        const defaultEmployees = [
+            { id: 'NV001', username: 'van.giamdoc', fullName: 'Nguyễn Thị Vân', role: 'Giám đốc', email: 'van.nt@truongtho.com', phone: '0912345678', password: '123' },
+            { id: 'NV002', username: 'tam.thukho', fullName: 'Trần Minh Tâm', role: 'Thủ kho', email: 'tam.tm@truongtho.com', phone: '0987654321', password: '123' },
+            { id: 'NV003', username: 'hung.ketoan', fullName: 'Lê Văn Hùng', role: 'Kế toán', email: 'hung.lv@truongtho.com', phone: '0905556667', password: '123' },
+            { id: 'NV004', username: 'admin', fullName: 'Trịnh Tuấn Minh', role: 'Admin', email: 'minh.tt@truongtho.com', phone: '0987654321', password: '123' },
+            { id: 'NV005', username: 'long.kinhdoanh', fullName: 'Vũ Hoàng Long', role: 'Kinh doanh', email: 'long.vh@truongtho.com', phone: '0944556677', password: '123' },
+            { id: 'NV006', username: 'mai.ketoan', fullName: 'Phan Thị Mai', role: 'Kế toán', email: 'mai.pt@truongtho.com', phone: '0955667788', password: '123' },
+            { id: 'NV007', username: 'tuan.thukho', fullName: 'Hoàng Anh Tuấn', role: 'Thủ kho', email: 'tuan.ha@truongtho.com', phone: '0966778899', password: '123' },
+            { id: 'NV008', username: 'ngoc.kinhdoanh', fullName: 'Nguyễn Bích Ngọc', role: 'Kinh doanh', email: 'ngoc.nb@truongtho.com', phone: '0977889900', password: '123' }
+        ];
+
+        function getEmployees() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            let parsed = null;
+            if (data) {
+                try {
+                    parsed = JSON.parse(data);
+                } catch(e) {
+                    console.error("Error parsing localStorage data:", e);
+                }
+            }
+
+            const needsSeed = !parsed || !Array.isArray(parsed) || parsed.length === 0 || !('fullName' in parsed[0]) || !parsed.some(emp => emp.fullName === 'Vũ Hoàng Long');
+
+            if (needsSeed) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultEmployees));
+                return defaultEmployees;
+            }
+
+            // Upgrade check: Ensure NV004 (admin) has role 'Admin'
+            let updated = false;
+            parsed = parsed.map(emp => {
+                if (emp.id === 'NV004' && emp.role !== 'Admin') {
+                    emp.role = 'Admin';
+                    updated = true;
+                }
+                return emp;
+            });
+            if (updated) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            }
+
+            // Ensure admin account is always present (in case user deleted it from local storage)
+            const hasAdmin = parsed.some(emp => emp.username === 'admin');
+            if (!hasAdmin) {
+                parsed.push({ id: 'NV004', username: 'admin', fullName: 'Trịnh Tuấn Minh', role: 'Admin', email: 'minh.tt@truongtho.com', phone: '0987654321', password: '123' });
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+            }
+
+            return parsed;
+        }
+
+        function saveEmployees(list) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+        }
+
+        // Auto sequential ID NVxxx generator
+        function generateNextId(list) {
+            if (list.length === 0) return 'NV001';
+            let maxNum = 0;
+            list.forEach(emp => {
+                const match = emp.id.match(/^NV(\d+)$/);
+                if (match) {
+                    const num = parseInt(match[1]);
+                    if (num > maxNum) maxNum = num;
+                }
+            });
+            return 'NV' + String(maxNum + 1).padStart(3, '0');
+        }
+
+        // DOM nodes
+        const tableBody = document.getElementById('employee-table-body');
+        const emptyState = document.getElementById('table-empty-state');
+        const searchInput = document.getElementById('table-search');
+        const roleFilter = document.getElementById('role-filter');
+        const paginationInfo = document.getElementById('table-pagination-info');
+
+        // Statistics
+        const statAdmin = document.getElementById('role-stat-admin');
+        const statGiamdoc = document.getElementById('role-stat-giamdoc');
+        const statThukho = document.getElementById('role-stat-thukho');
+        const statKetoan = document.getElementById('role-stat-ketoan');
+        const statKinhdoanh = document.getElementById('role-stat-kinhdoanh');
+        const statTotal = document.getElementById('role-stat-total');
+
+        // Modals
+        const addModal = document.getElementById('add-modal');
+        const editModal = document.getElementById('edit-modal');
+        const deleteModal = document.getElementById('delete-modal');
+
+        const openAddBtn = document.getElementById('open-add-btn');
+        const addForm = document.getElementById('add-form');
+        const editForm = document.getElementById('edit-form');
+        
+        let selectedUsernameToDelete = null;
+
+        // Render table records list
+        function renderTable() {
+            const list = getEmployees();
+            const search = searchInput.value.toLowerCase().trim();
+            const filter = roleFilter.value;
+
+            // Filter data array
+            let filtered = list.filter(emp => {
+                const matchesSearch = 
+                    emp.fullName.toLowerCase().includes(search) ||
+                    emp.id.toLowerCase().includes(search) ||
+                    emp.username.toLowerCase().includes(search);
+                const matchesRole = filter === 'Tất cả' || emp.role === filter;
+                return matchesSearch && matchesRole;
+            });
+
+            // Toggle empty states
+            if (filtered.length === 0) {
+                tableBody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                tableBody.innerHTML = filtered.map(emp => {
+                    let roleBadge = '';
+                    switch(emp.role) {
+                        case 'Admin':
+                            roleBadge = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-emerald-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-user-shield text-[9px]"></i> Admin</span>';
+                            break;
+                        case 'Giám đốc':
+                            roleBadge = '<span class="bg-purple-105 text-purple-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-purple-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-user-shield text-[9px]"></i> Giám đốc</span>';
+                            break;
+                        case 'Thủ kho':
+                            roleBadge = '<span class="bg-amber-105 text-amber-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-amber-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-warehouse text-[9px]"></i> Thủ kho</span>';
+                            break;
+                        case 'Kế toán':
+                            roleBadge = '<span class="bg-indigo-105 text-indigo-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-indigo-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-calculator text-[9px]"></i> Kế toán</span>';
+                            break;
+                        case 'Kinh doanh':
+                            roleBadge = '<span class="bg-blue-105 text-blue-700 px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-blue-200 uppercase inline-flex items-center gap-1.5"><i class="fa-solid fa-chart-line text-[9px]"></i> Kinh doanh</span>';
+                            break;
+                    }
+
+                    const isSelf = emp.username === getCurrentUsername();
+                    const nameDisplay = isSelf ? `${emp.fullName} (Bạn)` : emp.fullName;
+
+                    return `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="py-4 px-6 font-semibold text-slate-500 font-mono">${emp.id}</td>
+                            <td class="py-4 px-6">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs uppercase">
+                                        ${emp.fullName.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-slate-800 leading-tight">${nameDisplay}</p>
+                                        <p class="text-[11px] text-slate-400 font-semibold mt-0.5">${emp.role}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <div class="space-y-0.5">
+                                    <p class="font-semibold text-slate-700 flex items-center gap-1"><i class="fa-regular fa-user text-[11px] text-slate-400"></i> ${emp.username}</p>
+                                    <p class="text-[11px] text-slate-400 font-semibold flex items-center gap-1"><i class="fa-regular fa-envelope text-[11px]"></i> ${emp.email}</p>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">${roleBadge}</td>
+                            <td class="py-4 px-6 text-slate-650 font-semibold">${emp.phone}</td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex items-center justify-end gap-3">
+                                    <button onclick="openEditModal('${emp.id}')" class="text-slate-400 hover:text-blue-600 transition-colors focus:outline-none" title="Sửa tài khoản">
+                                        <i class="fa-solid fa-pen text-sm"></i>
+                                    </button>
+                                    <button onclick="openDeleteModal('${emp.username}')" class="text-slate-400 hover:text-rose-600 transition-colors focus:outline-none" title="Xóa tài khoản">
+                                        <i class="fa-regular fa-trash-can text-sm"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Sync Stats Counters
+            if (statAdmin) statAdmin.textContent = list.filter(emp => emp.role === 'Admin').length;
+            if (statGiamdoc) statGiamdoc.textContent = list.filter(emp => emp.role === 'Giám đốc').length;
+            if (statThukho) statThukho.textContent = list.filter(emp => emp.role === 'Thủ kho').length;
+            if (statKetoan) statKetoan.textContent = list.filter(emp => emp.role === 'Kế toán').length;
+            if (statKinhdoanh) statKinhdoanh.textContent = list.filter(emp => emp.role === 'Kinh doanh').length;
+            if (statTotal) statTotal.textContent = list.length;
+
+            // Sync footer info
+            paginationInfo.textContent = `Hiển thị 1 - ${filtered.length} trên tổng số ${filtered.length} tài khoản`;
+        }
+
+        // Validation triggers clearing
+        function clearErrors(form) {
+            form.querySelectorAll('.error-msg').forEach(el => {
+                el.classList.add('hidden');
+                el.innerHTML = '';
+            });
+            form.querySelectorAll('input, select').forEach(el => {
+                el.classList.remove('border-rose-500', 'focus:border-rose-500', 'bg-rose-50/5');
+            });
+        }
+
+        function displayError(inputEl, msgEl, text) {
+            inputEl.classList.add('border-rose-500', 'focus:border-rose-500', 'bg-rose-50/5');
+            msgEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${text}`;
+            msgEl.classList.remove('hidden');
+        }
+
+        function closeModal(modal, form) {
+            modal.classList.remove('open');
+            if (form) {
+                form.reset();
+                clearErrors(form);
+                const roleSelect = form.querySelector('select');
+                if (roleSelect) {
+                    roleSelect.disabled = false;
+                    roleSelect.classList.remove('bg-slate-100', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        // Trigger Add overlay
+        openAddBtn.addEventListener('click', () => {
+            const list = getEmployees();
+            addForm.querySelector('input[placeholder="[Mã tự động sinh]"]').value = generateNextId(list);
+            addModal.classList.add('open');
+        });
+
+        // Close triggers
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const modal = btn.closest('.modal-overlay');
+                const form = modal.querySelector('form');
+                closeModal(modal, form);
+            });
+        });
+
+        // 1. ADD ACCOUNT OVERLAY logic
+        addForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors(addForm);
+
+            const list = getEmployees();
+
+            const nameInput = document.getElementById('add-fullName');
+            const roleSelect = document.getElementById('add-role');
+            const usernameInput = document.getElementById('add-username');
+            const phoneInput = document.getElementById('add-phone');
+            const emailInput = document.getElementById('add-email');
+            const passInput = document.getElementById('add-password');
+            const confirmPassInput = document.getElementById('add-confirmPassword');
+
+            const nameVal = nameInput.value.trim();
+            const roleVal = roleSelect.value;
+            const usernameVal = usernameInput.value.trim();
+            const phoneVal = phoneInput.value.trim();
+            const emailVal = emailInput.value.trim();
+            const passVal = passInput.value;
+            const confirmPassVal = confirmPassInput.value;
+
+            let hasError = false;
+
+            // Empty checks
+            if (!nameVal) {
+                displayError(nameInput, nameInput.nextElementSibling, 'Họ và tên không được để trống.');
+                hasError = true;
+            }
+            if (!roleVal) {
+                displayError(roleSelect, roleSelect.nextElementSibling, 'Vui lòng chọn chức vụ.');
+                hasError = true;
+            }
+            if (!usernameVal) {
+                displayError(usernameInput, usernameInput.nextElementSibling, 'Tên đăng nhập không được để trống.');
+                hasError = true;
+            }
+            if (!phoneVal) {
+                displayError(phoneInput, phoneInput.nextElementSibling, 'Số điện thoại không được để trống.');
+                hasError = true;
+            }
+            if (!emailVal) {
+                displayError(emailInput, emailInput.nextElementSibling, 'Email không được để trống.');
+                hasError = true;
+            } else {
+                // Regex email format check
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailVal)) {
+                    displayError(emailInput, emailInput.nextElementSibling, 'Định dạng email không hợp lệ.');
+                    hasError = true;
+                }
+            }
+            if (!passVal) {
+                displayError(passInput, passInput.nextElementSibling, 'Mật khẩu không được để trống.');
+                hasError = true;
+            }
+            if (!confirmPassVal) {
+                displayError(confirmPassInput, confirmPassInput.nextElementSibling, 'Vui lòng xác nhận mật khẩu.');
+                hasError = true;
+            }
+
+            // Username duplicates
+            if (usernameVal) {
+                const isDuplicate = list.some(emp => emp.username.toLowerCase() === usernameVal.toLowerCase());
+                if (isDuplicate) {
+                    displayError(usernameInput, usernameInput.nextElementSibling, 'Tên đăng nhập này đã được sử dụng.');
+                    hasError = true;
+                }
+            }
+
+            // Mismatched passwords
+            if (passVal && confirmPassVal && passVal !== confirmPassVal) {
+                displayError(confirmPassInput, confirmPassInput.nextElementSibling, 'Mật khẩu xác nhận không trùng khớp.');
+                hasError = true;
+            }
+
+            if (hasError) return;
+
+            // Save new object
+            const newEmp = {
+                id: generateNextId(list),
+                username: usernameVal,
+                fullName: nameVal,
+                role: roleVal,
+                email: emailVal,
+                phone: phoneVal,
+                password: btoa(passVal) // simple base64 mock encryption
+            };
+
+            list.push(newEmp);
+            saveEmployees(list);
+
+            showToast("Tạo tài khoản thành công! Mật khẩu đã được mã hóa bảo mật.", 'success');
+            renderTable();
+            closeModal(addModal, addForm);
+        });
+
+        // 2. EDIT ACCOUNT OVERLAY logic
+        function openEditModal(empId) {
+            clearErrors(editForm);
+            const list = getEmployees();
+            const emp = list.find(e => e.id === empId);
+            if (!emp) return;
+
+            document.getElementById('edit-id').value = emp.id;
+            document.getElementById('edit-username').value = emp.username;
+            document.getElementById('edit-fullName').value = emp.fullName;
+            document.getElementById('edit-phone').value = emp.phone;
+            document.getElementById('edit-email').value = emp.email;
+
+            const roleSelect = document.getElementById('edit-role');
+            // Reset to default options without Admin
+            roleSelect.innerHTML = `
+                <option value="Thủ kho">Thủ kho</option>
+                <option value="Kế toán">Kế toán</option>
+                <option value="Kinh doanh">Kinh doanh</option>
+                <option value="Giám đốc">Giám đốc</option>
+            `;
+
+            if (emp.role === 'Admin') {
+                const adminOpt = document.createElement('option');
+                adminOpt.value = 'Admin';
+                adminOpt.textContent = 'Admin';
+                roleSelect.appendChild(adminOpt);
+                roleSelect.disabled = true;
+                roleSelect.classList.add('bg-slate-100', 'cursor-not-allowed');
+            } else {
+                roleSelect.disabled = false;
+                roleSelect.classList.remove('bg-slate-100', 'cursor-not-allowed');
+            }
+
+            roleSelect.value = emp.role;
+            editModal.classList.add('open');
+        }
+
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors(editForm);
+
+            const list = getEmployees();
+
+            const empId = document.getElementById('edit-id').value;
+            const usernameInput = document.getElementById('edit-username');
+            const nameInput = document.getElementById('edit-fullName');
+            const roleSelect = document.getElementById('edit-role');
+            const phoneInput = document.getElementById('edit-phone');
+            const emailInput = document.getElementById('edit-email');
+
+            const usernameVal = usernameInput.value.trim();
+            const nameVal = nameInput.value.trim();
+            const roleVal = roleSelect.value;
+            const phoneVal = phoneInput.value.trim();
+            const emailVal = emailInput.value.trim();
+
+            let hasError = false;
+
+            if (!usernameVal) {
+                displayError(usernameInput, usernameInput.nextElementSibling, 'Tên đăng nhập không được để trống.');
+                hasError = true;
+            } else {
+                // Username duplicate check excluding self
+                const isDuplicate = list.some(emp => emp.id !== empId && emp.username.toLowerCase() === usernameVal.toLowerCase());
+                if (isDuplicate) {
+                    displayError(usernameInput, usernameInput.nextElementSibling, 'Tên đăng nhập này đã được sử dụng.');
+                    hasError = true;
+                }
+            }
+
+            if (!nameVal) {
+                displayError(nameInput, nameInput.nextElementSibling, 'Họ và tên không được để trống.');
+                hasError = true;
+            }
+            if (!roleVal) {
+                displayError(roleSelect, roleSelect.nextElementSibling, 'Vui lòng chọn chức vụ.');
+                hasError = true;
+            }
+            if (!phoneVal) {
+                displayError(phoneInput, phoneInput.nextElementSibling, 'Số điện thoại không được để trống.');
+                hasError = true;
+            }
+            if (!emailVal) {
+                displayError(emailInput, emailInput.nextElementSibling, 'Email không được để trống.');
+                hasError = true;
+            } else {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailVal)) {
+                    displayError(emailInput, emailInput.nextElementSibling, 'Định dạng email không hợp lệ.');
+                    hasError = true;
+                }
+            }
+
+            if (hasError) return;
+
+            const idx = list.findIndex(e => e.id === empId);
+            if (idx !== -1) {
+                list[idx].username = usernameVal;
+                list[idx].fullName = nameVal;
+                list[idx].role = roleVal;
+                list[idx].phone = phoneVal;
+                list[idx].email = emailVal;
+
+                saveEmployees(list);
+                showToast("Cập nhật tài khoản thành công", 'success');
+                renderTable();
+                closeModal(editModal, editForm);
+            }
+        });
+
+        // 3. DELETE ACCOUNT OVERLAY logic
+        function openDeleteModal(username) {
+            selectedUsernameToDelete = username;
+            
+            const normalPrompt = document.getElementById('delete-modal-text');
+            const blockAlert = document.getElementById('delete-alert-box');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+            const iconWrap = document.getElementById('delete-icon-wrapper');
+
+            const activeUser = getCurrentUsername();
+            const list = getEmployees();
+            const targetEmp = list.find(e => e.username === username);
+            const isAdmin = targetEmp && targetEmp.role === 'Admin';
+
+            if (username === activeUser || isAdmin) {
+                // Block deletion layout trigger
+                normalPrompt.classList.add('hidden');
+                blockAlert.querySelector('p').textContent = "Hệ thống từ chối thao tác: Đây là tài khoản đang sử dụng!";
+                blockAlert.classList.remove('hidden');
+                confirmBtn.classList.add('hidden');
+                iconWrap.className = "w-12 h-12 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center mx-auto text-lg shadow-inner animate-bounce";
+            } else {
+                normalPrompt.classList.remove('hidden');
+                blockAlert.classList.add('hidden');
+                confirmBtn.classList.remove('hidden');
+                iconWrap.className = "w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-lg shadow-inner";
+            }
+
+            deleteModal.classList.add('open');
+        }
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', () => {
+            if (!selectedUsernameToDelete) return;
+            
+            const activeUser = getCurrentUsername();
+            let list = getEmployees();
+            const targetEmp = list.find(e => e.username === selectedUsernameToDelete);
+            const isAdmin = targetEmp && targetEmp.role === 'Admin';
+
+            if (selectedUsernameToDelete === activeUser || isAdmin) {
+                showToast('Hệ thống từ chối thao tác: Đây là tài khoản đang sử dụng!', 'error');
+                return;
+            }
+
+            if (targetEmp) {
+                list = list.filter(e => e.username !== selectedUsernameToDelete);
+                saveEmployees(list);
+                showToast("Xóa tài khoản thành công", 'success');
+                renderTable();
+            }
+            
+            deleteModal.classList.remove('open');
+            selectedUsernameToDelete = null;
+        });
+
+        // Interactive Toast Messages
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const typeConfig = {
+                info: {
+                    bg: 'bg-slate-900 text-white border border-slate-700',
+                    icon: '<i class="fa-solid fa-circle-info text-blue-400"></i>',
+                    title: 'Hệ Thống'
+                },
+                success: {
+                    bg: 'bg-emerald-950 text-white border border-emerald-700',
+                    icon: '<i class="fa-solid fa-circle-check text-emerald-400"></i>',
+                    title: 'Thành Công'
+                },
+                error: {
+                    bg: 'bg-rose-950 text-white border border-rose-700',
+                    icon: '<i class="fa-solid fa-circle-xmark text-rose-400"></i>',
+                    title: 'Cảnh Báo'
+                }
+            };
+
+            const cfg = typeConfig[type] || typeConfig.info;
+
+            toast.className = `p-4.5 rounded-lg shadow-lg flex gap-3 transform translate-y-[-10px] opacity-0 transition-all duration-300 ease-out ${cfg.bg}`;
+            toast.innerHTML = `
+                <div class="flex-shrink-0 mt-0.5">${cfg.icon}</div>
+                <div class="flex-grow space-y-0.5">
+                    <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-300">${cfg.title}</h4>
+                    <p class="text-xs font-medium">${message}</p>
+                </div>
+                <button class="flex-shrink-0 text-slate-400 hover:text-white transition-colors h-fit self-start ml-2 focus:outline-none">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-[-10px]', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+
+            const dismiss = () => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-[-10px]', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            };
+
+            toast.querySelector('button').addEventListener('click', dismiss);
+            setTimeout(dismiss, 4000);
+        }
+
+        // Sync parent template top bar profile info
+        function syncParentProfileBar() {
+            try {
+                if (window.parent && window.parent.document) {
+                    const nameNode = window.parent.document.getElementById('user-name');
+                    const roleNode = window.parent.document.getElementById('user-role');
+                    const avatarNode = window.parent.document.getElementById('user-avatar');
+                    const dropdownName = window.parent.document.getElementById('dropdown-user-name');
+                    const dropdownEmail = window.parent.document.getElementById('dropdown-user-email');
+
+                    if (nameNode) nameNode.textContent = "Minh (Admin)";
+                    if (roleNode) roleNode.textContent = "Quản lý kỹ thuật";
+                    if (avatarNode) avatarNode.textContent = "M";
+                    if (dropdownName) dropdownName.textContent = "Minh";
+                    if (dropdownEmail) dropdownEmail.textContent = "minh.tt@truongtho.com";
+                }
+            } catch (e) {
+                console.warn('Iframe notice: could not synchronize parent top navigation headers.', e);
+            }
+        }
+
+        // Toolbar filter inputs listeners
+        searchInput.addEventListener('input', renderTable);
+        roleFilter.addEventListener('change', renderTable);
+
+        // Bootstrap page mockup
+        document.addEventListener('DOMContentLoaded', () => {
+            getEmployees(); // seed default lists
+            renderTable();
+            syncParentProfileBar();
+        });
+    </script>
+</body>
+</html>
