@@ -24,6 +24,7 @@
                 </a>
             </nav>
         </div>
+
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -37,26 +38,22 @@
 
         <!-- Filters -->
         <div class="bg-white border border-slate-200 rounded-xl p-4 mb-5 shadow-sm">
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-3 gap-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Tìm kiếm</label>
-                    <input type="text" placeholder="Mã biên bản, phiếu nhập..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                    <input type="text" id="filter-search" placeholder="Mã biên bản, phiếu nhập..." class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nhà cung cấp</label>
-                    <select class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
-                        <option>Tất cả</option>
-                        <option>Công ty Knauf Việt Nam</option>
-                        <option>Công ty Vĩnh Tường</option>
+                    <select id="filter-ncc" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                        <option value="">Tất cả</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Từ ngày</label>
-                    <input type="date" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Đến ngày</label>
-                    <input type="date" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Phiếu nhập</label>
+                    <select id="filter-phieu" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                        <option value="">Tất cả phiếu nhập</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -75,88 +72,118 @@
                         <th class="px-4 py-3.5 font-bold text-slate-600 uppercase text-xs text-center">Thao tác</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-5 py-4">
-                            <a href="#" class="font-bold text-red-500 hover:underline">BBHL-202605-001</a>
-                        </td>
-                        <td class="px-4 py-4">
-                            <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202605-004</a>
-                        </td>
-                        <td class="px-4 py-4 text-slate-700">Công ty Knauf Việt Nam</td>
-                        <td class="px-4 py-4 text-slate-600">05/05/2026 16:30</td>
-                        <td class="px-4 py-4 text-center">
-                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold text-xs">2 loại</span>
-                        </td>
-                        <td class="px-4 py-4 text-slate-600">Lân (Thủ kho)</td>
-                        <td class="px-4 py-4 text-center">
-                            <button class="text-blue-600 hover:text-blue-700 mx-1" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="text-slate-600 hover:text-slate-700 mx-1" title="In biên bản">
-                                <i class="fas fa-print"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-5 py-4">
-                            <a href="#" class="font-bold text-red-500 hover:underline">BBHL-202604-012</a>
-                        </td>
-                        <td class="px-4 py-4">
-                            <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202604-028</a>
-                        </td>
-                        <td class="px-4 py-4 text-slate-700">Công ty Vĩnh Tường</td>
-                        <td class="px-4 py-4 text-slate-600">28/04/2026 10:15</td>
-                        <td class="px-4 py-4 text-center">
-                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold text-xs">1 loại</span>
-                        </td>
-                        <td class="px-4 py-4 text-slate-600">Lân (Thủ kho)</td>
-                        <td class="px-4 py-4 text-center">
-                            <button class="text-blue-600 hover:text-blue-700 mx-1" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="text-slate-600 hover:text-slate-700 mx-1" title="In biên bản">
-                                <i class="fas fa-print"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-5 py-4">
-                            <a href="#" class="font-bold text-red-500 hover:underline">BBHL-202604-008</a>
-                        </td>
-                        <td class="px-4 py-4">
-                            <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202604-019</a>
-                        </td>
-                        <td class="px-4 py-4 text-slate-700">Công ty Knauf Việt Nam</td>
-                        <td class="px-4 py-4 text-slate-600">15/04/2026 14:20</td>
-                        <td class="px-4 py-4 text-center">
-                            <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold text-xs">3 loại</span>
-                        </td>
-                        <td class="px-4 py-4 text-slate-600">Lân (Thủ kho)</td>
-                        <td class="px-4 py-4 text-center">
-                            <button class="text-blue-600 hover:text-blue-700 mx-1" title="Xem chi tiết">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="text-slate-600 hover:text-slate-700 mx-1" title="In biên bản">
-                                <i class="fas fa-print"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
+                <tbody id="bien-ban-tbody" class="divide-y divide-slate-100"></tbody>
             </table>
 
-            <!-- Pagination -->
+            <div id="empty-state" class="hidden py-16 text-center">
+                <i class="fas fa-clipboard-list text-3xl text-slate-300 mb-3"></i>
+                <p class="text-slate-400 text-sm">Chưa có biên bản hàng lỗi nào.</p>
+            </div>
+
             <div class="px-5 py-4 border-t border-slate-200 flex items-center justify-between">
-                <p class="text-sm text-slate-500">Hiển thị <span class="font-semibold">1-3</span> trong tổng số <span class="font-semibold">3</span> biên bản</p>
-                <div class="flex space-x-2">
-                    <button class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>Trước</button>
-                    <button class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-semibold">1</button>
-                    <button class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>Sau</button>
-                </div>
+                <p class="text-sm text-slate-500" id="pagination-info">Đang tải...</p>
             </div>
         </div>
     </div>
 
+    <script src="../../assets/js/mock_data.js"></script>
     <script src="../../assets/js/navigation.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+        function populateFilters() {
+            const bienBanList = DB.get('ttcn_bien_ban');
+            const phieuList = DB.get('ttcn_phieu_nhap');
+
+            // Nhà cung cấp duy nhất
+            const nccSet = [...new Set(bienBanList.map(b => b.Ten_NCC))];
+            const selNCC = document.getElementById('filter-ncc');
+            nccSet.forEach(ncc => {
+                const opt = document.createElement('option');
+                opt.value = ncc; opt.textContent = ncc;
+                selNCC.appendChild(opt);
+            });
+
+            // Phiếu nhập
+            const selPhieu = document.getElementById('filter-phieu');
+            phieuList.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.Ma_Phieu_Nhap;
+                opt.textContent = `${p.Ma_Phieu_Nhap} — ${p.Ten_NCC}`;
+                selPhieu.appendChild(opt);
+            });
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('bien-ban-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const info = document.getElementById('pagination-info');
+            const chiTiet = DB.get('ttcn_chi_tiet_bien_ban');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                info.textContent = 'Không có dữ liệu';
+                return;
+            }
+            emptyState.classList.add('hidden');
+            info.textContent = `Hiển thị ${data.length} biên bản`;
+
+            tbody.innerHTML = data.map(b => {
+                const soLoai = chiTiet.filter(c => c.Ma_Bien_Ban === b.Ma_Bien_Ban).length;
+                return `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-5 py-4"><a href="#" class="font-bold text-red-500 hover:underline">${b.Ma_Bien_Ban}</a></td>
+                    <td class="px-4 py-4"><span class="font-semibold text-blue-600">${b.Ma_Phieu_Nhap}</span></td>
+                    <td class="px-4 py-4 text-slate-700">${b.Ten_NCC}</td>
+                    <td class="px-4 py-4 text-slate-600">${formatDateTime(b.Ngay_Lap)}</td>
+                    <td class="px-4 py-4 text-center">
+                        <span class="bg-red-100 text-red-700 px-3 py-1 rounded-full font-semibold text-xs">${soLoai} loại</span>
+                    </td>
+                    <td class="px-4 py-4 text-slate-600">${b.Nguoi_Lap}</td>
+                    <td class="px-4 py-4 text-center">
+                        <button class="text-blue-600 hover:text-blue-700 mx-1" title="Xem chi tiết" onclick="xemChiTiet('${b.Ma_Bien_Ban}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700 mx-1" title="Xóa" onclick="xoa('${b.Ma_Bien_Ban}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function loadData() {
+            let data = DB.get('ttcn_bien_ban');
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const ncc = document.getElementById('filter-ncc').value;
+            const phieu = document.getElementById('filter-phieu').value;
+            if (search) data = data.filter(b => b.Ma_Bien_Ban.toLowerCase().includes(search) || b.Ma_Phieu_Nhap.toLowerCase().includes(search));
+            if (ncc) data = data.filter(b => b.Ten_NCC === ncc);
+            if (phieu) data = data.filter(b => b.Ma_Phieu_Nhap === phieu);
+            renderTable(data);
+        }
+
+        function xemChiTiet(ma) {
+            const bb = DB.get('ttcn_bien_ban').find(b => b.Ma_Bien_Ban === ma);
+            const ct = DB.get('ttcn_chi_tiet_bien_ban').filter(c => c.Ma_Bien_Ban === ma);
+            let msg = `📋 ${bb.Ma_Bien_Ban}\nPhiếu nhập: ${bb.Ma_Phieu_Nhap}\nNCC: ${bb.Ten_NCC}\n\nChi tiết hàng lỗi:\n`;
+            ct.forEach(c => { msg += `- ${c.Ma_Vat_Tu} | ${c.Ten_Vat_Tu} | SL lỗi: ${c.So_Luong_Loi} | ${c.Mo_Ta_Loi}\n`; });
+            alert(msg);
+        }
+
+        function xoa(ma) {
+            if (!confirm(`Xóa biên bản ${ma}?`)) return;
+            DB.set('ttcn_bien_ban', DB.get('ttcn_bien_ban').filter(b => b.Ma_Bien_Ban !== ma));
+            DB.set('ttcn_chi_tiet_bien_ban', DB.get('ttcn_chi_tiet_bien_ban').filter(c => c.Ma_Bien_Ban !== ma));
+            loadData();
+        }
+
+        document.getElementById('filter-search').addEventListener('input', loadData);
+        document.getElementById('filter-ncc').addEventListener('change', loadData);
+        document.getElementById('filter-phieu').addEventListener('change', loadData);
+
+        populateFilters();
+        loadData();
+    </script>
 </body>
 </html>

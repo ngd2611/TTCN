@@ -9,185 +9,364 @@
     <link rel="stylesheet" href="../../assets/css/global.css">
 </head>
 <body class="bg-[#F4F7F9] text-slate-800">
-    <!-- Page Content -->
     <div class="p-6">
         <!-- Page Title -->
         <div class="flex items-center mb-5">
-                <button data-nav="importList" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center mr-4 shadow-sm transition-colors">
-                    <i class="fas fa-arrow-left text-slate-500 text-[13px]"></i>
-                </button>
+            <button data-nav="importList" class="w-8 h-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 flex items-center justify-center mr-4 shadow-sm transition-colors">
+                <i class="fas fa-arrow-left text-slate-500 text-[13px]"></i>
+            </button>
+            <div>
+                <h2 class="text-[20px] font-bold text-slate-800 leading-tight">Tạo Phiếu nhập kho</h2>
+                <p class="text-[13px] text-slate-500 mt-0.5">Lập phiếu nhập kho thực tế. Chọn từ đề xuất đã duyệt hoặc nhập trực tiếp.</p>
+            </div>
+        </div>
+
+        <!-- Two-column layout -->
+        <div class="flex gap-5 items-start">
+
+            <!-- LEFT: Thông tin phiếu nhập -->
+            <div class="w-[310px] shrink-0 bg-white border border-slate-200 rounded-xl shadow-sm p-5">
+                <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-4">Thông tin phiếu nhập</h3>
+
+                <!-- Mã phiếu (auto) -->
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Mã phiếu hệ thống</label>
+                    <input type="text" id="ma-phieu-nhap" readonly
+                        class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] font-semibold text-slate-600 outline-none cursor-not-allowed">
+                </div>
+
+                <!-- Ngày lập (auto) -->
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Ngày lập</label>
+                    <input type="text" id="ngay-lap" readonly
+                        class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-600 outline-none cursor-not-allowed">
+                </div>
+
+                <!-- Chọn Đề xuất đã duyệt -->
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">
+                        Từ đề xuất đã duyệt
+                    </label>
+                    <div class="relative">
+                        <select id="select-de-xuat" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-blue-500 pr-8 transition-colors">
+                            <option value="">— Nhập trực tiếp (không từ đề xuất) —</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[11px] pointer-events-none"></i>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">Chọn đề xuất để tự động điền vật tư bên phải.</p>
+                </div>
+
+                <!-- Nhà cung cấp -->
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">
+                        Nhà cung cấp <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <select id="select-ncc" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-700 outline-none focus:border-blue-500 pr-8 transition-colors">
+                            <option value="" disabled selected>-- Chọn nhà cung cấp --</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[11px] pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Chứng từ gốc -->
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">
+                        Chứng từ gốc (Số phiếu giao hàng) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="chung-tu-goc" placeholder="VD: KNA-HB-99812"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-colors">
+                </div>
+
+                <!-- Ghi chú -->
+                <div class="mb-4">
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Ghi chú nhập kho</label>
+                    <input type="text" id="ghi-chu" placeholder="Nhập ghi chú..."
+                        class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-700 placeholder-slate-400 outline-none focus:border-blue-500 focus:bg-white transition-colors">
+                </div>
+
+                <!-- Người lập (auto) -->
                 <div>
-                    <h2 class="text-[20px] font-bold text-slate-800 leading-tight">Tạo Phiếu nhập kho</h2>
-                    <p class="text-[13px] text-slate-500 mt-0.5">Lập phiếu nhập kho thực tế dựa trên yêu cầu nhập kho đã được phê duyệt.</p>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Người lập</label>
+                    <input type="text" id="nguoi-lap" readonly
+                        class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-600 outline-none cursor-not-allowed">
                 </div>
             </div>
 
-            <!-- Two-column layout -->
-            <div class="flex gap-5 items-start">
+            <!-- RIGHT: Chi tiết vật tư nhập kho -->
+            <div class="flex-1 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
 
-                <!-- LEFT: Thông tin phiếu nhập -->
-                <div class="w-[290px] shrink-0 bg-white border border-slate-200 rounded-xl shadow-sm p-5">
-                    <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-4">Thông tin phiếu nhập</h3>
-
-                    <!-- Mã phiếu hệ thống -->
-                    <div class="mb-4">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Mã phiếu hệ thống</label>
-                        <input type="text" value="PNK-202605-004" readonly
-                            class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] font-semibold text-slate-600 outline-none cursor-not-allowed">
-                    </div>
-
-                    <!-- Ngày lập -->
-                    <div class="mb-4">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Ngày lập</label>
-                        <input type="text" value="05/05/2026 16:10" readonly
-                            class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-600 outline-none cursor-not-allowed">
-                    </div>
-
-                    <!-- Chứng từ gốc -->
-                    <div class="mb-4">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">
-                            Chứng từ gốc (Số hiệu phiếu giao hàng) <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <input type="text" value="KNA-HB-99812"
-                                class="w-full bg-red-50 border border-red-300 rounded-md px-3 py-2 text-[13px] font-semibold text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-colors pr-8">
-                            <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[11px] pointer-events-none"></i>
-                        </div>
-                    </div>
-
-                    <!-- Nhà cung cấp -->
-                    <div class="mb-4">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Nhà cung cấp</label>
-                        <input type="text" value="Công ty Knauf Việt Nam" readonly
-                            class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-600 outline-none cursor-not-allowed">
-                    </div>
-
-                    <!-- Ghi chú nhập kho -->
-                    <div class="mb-4">
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Ghi chú nhập kho</label>
-                        <input type="text" placeholder="Nhập ghi chú..."
-                            class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-700 placeholder-slate-400 outline-none focus:border-blue-500 focus:bg-white transition-colors">
-                    </div>
-
-                    <!-- Người lập -->
-                    <div>
-                        <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1.5">Người lập</label>
-                        <input type="text" value="Lân (Thủ kho)" readonly
-                            class="w-full bg-slate-50 border border-slate-200 rounded-md px-3 py-2 text-[13px] text-slate-600 outline-none cursor-not-allowed">
+                <!-- Table header -->
+                <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
+                    <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Chi tiết vật tư nhập kho</h3>
+                    <div class="flex items-center gap-3">
+                        <span id="ke-thua-label" class="text-[11px] text-slate-400 hidden">
+                            Kế thừa từ: <span id="ke-thua-ma" class="font-bold text-slate-600"></span>
+                        </span>
+                        <button id="btn-them-vt" class="flex items-center text-[13px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                            <i class="fas fa-plus mr-1.5 text-[11px]"></i> Thêm dòng
+                        </button>
                     </div>
                 </div>
 
-                <!-- RIGHT: Chi tiết vật tư nhập kho -->
-                <div class="flex-1 bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <!-- Table -->
+                <table class="w-full text-[13px] text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 bg-white">
+                            <th class="py-3 px-5 font-bold text-slate-500 uppercase text-[11px] w-[130px]">Mã VT</th>
+                            <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Tên vật tư</th>
+                            <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] w-[70px]">ĐVT</th>
+                            <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center w-[110px]">SL theo đơn</th>
+                            <th class="py-3 px-4 font-bold text-blue-600 uppercase text-[11px] text-center w-[120px]">SL thực nhận</th>
+                            <th class="py-3 px-4 font-bold text-blue-600 uppercase text-[11px] text-center w-[120px]">Đơn giá (đ)</th>
+                            <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center w-[50px]">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vattu-body" class="divide-y divide-slate-100"></tbody>
+                </table>
 
-                    <!-- Table header -->
-                    <div class="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-                        <h3 class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Chi tiết vật tư nhập kho</h3>
-                        <div class="text-[11px] text-slate-400 font-medium">
-                            Kế thừa từ: <span class="font-bold text-slate-600">YCX-202605-001</span>
-                        </div>
-                    </div>
-
-                    <!-- Table -->
-                    <table class="w-full text-[13px] text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-200 bg-white">
-                                <th class="py-3 px-5 font-bold text-slate-500 uppercase text-[11px] w-[110px]">Mã VT</th>
-                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px]">Tên vật tư</th>
-                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] w-[80px]">ĐVT</th>
-                                <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center w-[110px]">SL theo đơn</th>
-                                <th class="py-3 px-4 font-bold text-blue-600 uppercase text-[11px] text-center w-[140px]">Hàng lỗi/vỡ</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="vattu-body">
-
-                            <!-- Row 1 -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-red-500 hover:underline">TC-KN-09</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-700 font-medium">Tấm thạch cao Knauf Standard 9mm</td>
-                                <td class="py-3 px-4 text-slate-600">Tấm</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-800">100</td>
-                                <td class="py-3 px-4 text-center">
-                                    <input type="text" value="2 tấm"
-                                        class="w-24 text-center bg-white border border-slate-300 rounded-md px-2 py-1.5 text-[13px] font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors shadow-sm">
-                                </td>
-                            </tr>
-
-                            <!-- Row 2 -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-red-500 hover:underline">KX-VT-24</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-700 font-medium">Khung xương trần chìm Vĩnh Tường</td>
-                                <td class="py-3 px-4 text-slate-600">Bó</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-800">50</td>
-                                <td class="py-3 px-4 text-center">
-                                    <input type="number" value="0" min="0"
-                                        class="w-24 text-center bg-white border border-slate-300 rounded-md px-2 py-1.5 text-[13px] font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors shadow-sm">
-                                </td>
-                            </tr>
-
-                            <!-- Row 3 -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-red-500 hover:underline">SG-WL-08</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-700 font-medium">Sàn gỗ công nghiệp 8mm Walnut</td>
-                                <td class="py-3 px-4 text-slate-600">m²</td>
-                                <td class="py-3 px-4 text-center font-semibold text-slate-800">200</td>
-                                <td class="py-3 px-4 text-center">
-                                    <input type="number" value="0" min="0"
-                                        class="w-24 text-center bg-white border border-slate-300 rounded-md px-2 py-1.5 text-[13px] font-semibold text-slate-800 outline-none focus:border-blue-500 transition-colors shadow-sm">
-                                </td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-
-                    <!-- Lập biên bản lỗi button -->
-                    <div class="px-5 py-4 border-t border-slate-100">
-                        <button id="btn-bien-ban"
-                            class="inline-flex items-center bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-md text-[13px] font-semibold transition-colors shadow-sm">
-                            <i class="fas fa-plus mr-1.5 text-[11px]"></i> Lập biên bản lỗi
-                        </button>
-                    </div>
-
-                    <!-- Biên bản lỗi panel (hidden by default) -->
-                    <div id="bien-ban-panel" class="hidden mx-5 mb-4 border border-red-200 rounded-lg bg-red-50 p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <h4 class="text-[13px] font-bold text-red-600"><i class="fas fa-exclamation-triangle mr-2"></i>Biên bản hàng lỗi / vỡ</h4>
-                            <button onclick="document.getElementById('bien-ban-panel').classList.add('hidden')" class="text-red-400 hover:text-red-600 text-[12px]">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <textarea rows="3" placeholder="Mô tả chi tiết hàng lỗi, vỡ, số lượng từng loại, trạng thái thực tế..."
-                            class="w-full bg-white border border-red-200 rounded-md px-3 py-2 text-[13px] text-slate-700 placeholder-slate-400 outline-none focus:border-red-400 resize-none transition-colors"></textarea>
-                        <div class="flex justify-end mt-2">
-                            <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded-md text-[13px] font-semibold transition-colors">
-                                <i class="fas fa-save mr-1.5"></i> Lưu biên bản
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Action buttons -->
-                    <div class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-3">
-                        <button class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-2 rounded-lg text-[13px] font-semibold transition-colors">
-                            Hủy bỏ
-                        </button>
-                        <button class="bg-[#2563EB] hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-[13px] font-semibold flex items-center shadow-sm transition-colors">
-                            <i class="fas fa-check mr-2 text-[12px]"></i> Lưu phiếu nhập
-                        </button>
-                    </div>
-
+                <div id="vattu-empty" class="py-10 text-center text-slate-400 text-[13px]">
+                    <i class="fas fa-inbox text-2xl mb-2 text-slate-300"></i><br>
+                    Chọn đề xuất hoặc thêm dòng vật tư mới.
                 </div>
+
+                <!-- Action buttons -->
+                <div class="px-5 py-4 border-t border-slate-200 flex justify-end space-x-3">
+                    <button id="btn-huy" class="bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-2 rounded-lg text-[13px] font-semibold transition-colors">
+                        Hủy bỏ
+                    </button>
+                    <button id="btn-luu-phieu" class="bg-[#2563EB] hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-[13px] font-semibold flex items-center shadow-sm transition-colors">
+                        <i class="fas fa-check mr-2 text-[12px]"></i> Lưu phiếu nhập
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Load Core Scripts -->
+    <script src="../../assets/js/mock_data.js"></script>
     <script src="../../assets/js/navigation.js"></script>
     <script src="../../assets/js/main.js"></script>
+    <script>
+        // ===== KHỞI TẠO =====
+        const vatTuList = DB.get('ttcn_vat_tu');
+        const nccList   = DB.get('ttcn_nha_cung_cap');
+        const deXuatList = DB.get('ttcn_de_xuat').filter(d => d.Trang_Thai === 'Da_Duyet');
+        const chiTietDX = DB.get('ttcn_chi_tiet_de_xuat');
+
+        // Auto-fill
+        document.getElementById('ma-phieu-nhap').value = generateCode('PNK', DB.get('ttcn_phieu_nhap'), 'Ma_Phieu_Nhap');
+        document.getElementById('ngay-lap').value = formatDateTime(new Date().toISOString());
+        document.getElementById('nguoi-lap').value = getCurrentUser();
+
+        // Load đề xuất đã duyệt
+        const selDX = document.getElementById('select-de-xuat');
+        deXuatList.forEach(dx => {
+            const opt = document.createElement('option');
+            opt.value = dx.Ma_De_Xuat;
+            opt.textContent = `${dx.Ma_De_Xuat} — ${dx.Ten_NCC}`;
+            opt.dataset.maNCC = dx.Ma_NCC;
+            selDX.appendChild(opt);
+        });
+
+        // Load nhà cung cấp
+        const selNCC = document.getElementById('select-ncc');
+        nccList.forEach(ncc => {
+            const opt = document.createElement('option');
+            opt.value = ncc.Ma_NCC;
+            opt.textContent = ncc.Ten_NCC;
+            selNCC.appendChild(opt);
+        });
+
+        // ===== LOGIC CHỌN ĐỀ XUẤT → RENDER VẬT TƯ =====
+        selDX.addEventListener('change', function() {
+            const maDX = this.value;
+            const tbody = document.getElementById('vattu-body');
+            const empty = document.getElementById('vattu-empty');
+
+            if (!maDX) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                document.getElementById('ke-thua-label').classList.add('hidden');
+                document.getElementById('btn-them-vt').classList.remove('hidden');
+                selNCC.disabled = false;
+                selNCC.value = '';
+                return;
+            }
+
+            // Tìm NCC của đề xuất và set
+            const dx = deXuatList.find(d => d.Ma_De_Xuat === maDX);
+            if (dx) {
+                selNCC.value = dx.Ma_NCC;
+                selNCC.disabled = true; // Khóa vì đã kế thừa từ đề xuất
+            }
+
+            // Hiển thị kế thừa
+            document.getElementById('ke-thua-label').classList.remove('hidden');
+            document.getElementById('ke-thua-ma').textContent = maDX;
+            document.getElementById('btn-them-vt').classList.add('hidden'); // Ẩn "Thêm dòng" khi từ đề xuất
+
+            // Lấy vật tư thuộc đề xuất
+            const vatTuCuaDX = chiTietDX.filter(c => c.Ma_De_Xuat === maDX);
+            if (vatTuCuaDX.length === 0) {
+                tbody.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            tbody.innerHTML = vatTuCuaDX.map((c, i) => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3 px-5 font-semibold text-blue-600">${c.Ma_Vat_Tu}</td>
+                    <td class="py-3 px-4 text-slate-700 font-medium">${c.Ten_Vat_Tu}</td>
+                    <td class="py-3 px-4 text-slate-600">${c.Ten_DVT}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-slate-800">${c.So_Luong_De_Xuat}</td>
+                    <td class="py-3 px-4 text-center">
+                        <input type="number" id="sl-nhap-${i}" value="${c.So_Luong_De_Xuat}" min="0" data-ma="${c.Ma_Vat_Tu}"
+                            class="w-20 text-center bg-white border border-blue-200 rounded-md px-2 py-1.5 text-[13px] font-semibold outline-none focus:border-blue-500 transition-colors shadow-sm">
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <input type="number" id="dg-${i}" value="0" min="0" data-ma="${c.Ma_Vat_Tu}"
+                            class="w-24 text-center bg-white border border-blue-200 rounded-md px-2 py-1.5 text-[13px] font-semibold outline-none focus:border-blue-500 transition-colors shadow-sm">
+                    </td>
+                    <td class="py-3 px-4 text-center text-slate-300">—</td>
+                </tr>
+            `).join('');
+        });
+
+        // ===== NHẬP TRỰC TIẾP: Thêm dòng tự do =====
+        let freeRowCount = 0;
+
+        function taoRowTuDo(index) {
+            const opts = vatTuList.map(v =>
+                `<option value="${v.Ma_Vat_Tu}" data-ten="${v.Ten_Vat_Tu}" data-dvt="${v.Ten_DVT}">${v.Ma_Vat_Tu} — ${v.Ten_Vat_Tu}</option>`
+            ).join('');
+            return `
+            <tr id="free-row-${index}" class="hover:bg-slate-50 transition-colors">
+                <td class="py-2 px-5">
+                    <select onchange="onChonVT(this, ${index})"
+                        class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-md px-2 py-1.5 text-[13px] text-slate-700 outline-none focus:border-blue-500">
+                        <option value="" disabled selected>-- Chọn --</option>${opts}
+                    </select>
+                </td>
+                <td class="py-2 px-4 text-slate-700 text-[12px]" id="free-ten-${index}"><span class="text-slate-400 italic">—</span></td>
+                <td class="py-2 px-4 text-slate-600 text-[12px]" id="free-dvt-${index}"><span class="text-slate-400 italic">—</span></td>
+                <td class="py-2 px-4 text-center text-slate-400 text-[12px]">—</td>
+                <td class="py-2 px-4 text-center">
+                    <input type="number" id="free-sl-${index}" value="1" min="0"
+                        class="w-20 text-center bg-white border border-blue-200 rounded-md px-2 py-1.5 text-[13px] font-semibold outline-none focus:border-blue-500 shadow-sm">
+                </td>
+                <td class="py-2 px-4 text-center">
+                    <input type="number" id="free-dg-${index}" value="0" min="0"
+                        class="w-24 text-center bg-white border border-blue-200 rounded-md px-2 py-1.5 text-[13px] font-semibold outline-none focus:border-blue-500 shadow-sm">
+                </td>
+                <td class="py-2 px-4 text-center">
+                    <button class="text-red-400 hover:text-red-600" onclick="removeRow(this)">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </td>
+            </tr>`;
+        }
+
+        function onChonVT(sel, i) {
+            const opt = sel.options[sel.selectedIndex];
+            document.getElementById(`free-ten-${i}`).textContent = opt.dataset.ten || '—';
+            document.getElementById(`free-dvt-${i}`).textContent = opt.dataset.dvt || '—';
+        }
+
+        function removeRow(btn) {
+            btn.closest('tr').remove();
+            if (document.getElementById('vattu-body').children.length === 0) {
+                document.getElementById('vattu-empty').classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('btn-them-vt').addEventListener('click', function() {
+            const tbody = document.getElementById('vattu-body');
+            document.getElementById('vattu-empty').classList.add('hidden');
+            tbody.insertAdjacentHTML('beforeend', taoRowTuDo(freeRowCount++));
+        });
+
+        // ===== SUBMIT =====
+        document.getElementById('btn-luu-phieu').addEventListener('click', function() {
+            const maPN   = document.getElementById('ma-phieu-nhap').value;
+            const maNCC  = selNCC.value;
+            const tenNCC = selNCC.options[selNCC.selectedIndex]?.textContent || '';
+            const maDX   = selDX.value || null;
+            const chungTu = document.getElementById('chung-tu-goc').value.trim();
+            const ghiChu  = document.getElementById('ghi-chu').value.trim();
+
+            if (!maNCC) { alert('Vui lòng chọn nhà cung cấp!'); return; }
+            if (!chungTu) { alert('Vui lòng nhập chứng từ gốc!'); return; }
+
+            // Thu thập vật tư từ bảng
+            const rows = document.querySelectorAll('#vattu-body tr');
+            if (rows.length === 0) { alert('Vui lòng thêm ít nhất 1 vật tư!'); return; }
+
+            const chiTietMoi = [];
+
+            if (maDX) {
+                // Từ đề xuất - lấy input sl và đơn giá
+                const vatTuCuaDX = chiTietDX.filter(c => c.Ma_De_Xuat === maDX);
+                vatTuCuaDX.forEach((c, i) => {
+                    const sl = parseInt(document.getElementById(`sl-nhap-${i}`)?.value) || 0;
+                    const dg = parseInt(document.getElementById(`dg-${i}`)?.value) || 0;
+                    chiTietMoi.push({
+                        Ma_Phieu_Nhap: maPN,
+                        Ma_Vat_Tu: c.Ma_Vat_Tu,
+                        Ten_Vat_Tu: c.Ten_Vat_Tu,
+                        Ten_DVT: c.Ten_DVT,
+                        So_Luong_Nhap: sl,
+                        Don_Gia: dg,
+                    });
+                });
+            } else {
+                // Nhập trực tiếp
+                let valid = true;
+                rows.forEach((row, i) => {
+                    const sel = row.querySelector('select');
+                    if (!sel || !sel.value) { alert(`Dòng ${i+1}: Chưa chọn vật tư!`); valid = false; return; }
+                    const vt = vatTuList.find(v => v.Ma_Vat_Tu === sel.value);
+                    const slInput = row.querySelectorAll('input[type="number"]')[0];
+                    const dgInput = row.querySelectorAll('input[type="number"]')[1];
+                    chiTietMoi.push({
+                        Ma_Phieu_Nhap: maPN,
+                        Ma_Vat_Tu: vt.Ma_Vat_Tu,
+                        Ten_Vat_Tu: vt.Ten_Vat_Tu,
+                        Ten_DVT: vt.Ten_DVT,
+                        So_Luong_Nhap: parseInt(slInput?.value) || 0,
+                        Don_Gia: parseInt(dgInput?.value) || 0,
+                    });
+                });
+                if (!valid) return;
+            }
+
+            // Lưu phiếu nhập
+            const phieuMoi = {
+                Ma_Phieu_Nhap: maPN,
+                Ma_De_Xuat: maDX,
+                Ma_NCC: maNCC,
+                Ten_NCC: tenNCC,
+                Chung_Tu_Goc: chungTu,
+                Ngay_Nhap: new Date().toISOString(),
+                Trang_Thai: 'Cho_Nhap_Hang',
+                Ghi_Chu: ghiChu,
+                Nguoi_Lap: getCurrentUser(),
+            };
+
+            const dsPhieu = DB.get('ttcn_phieu_nhap');
+            dsPhieu.push(phieuMoi);
+            DB.set('ttcn_phieu_nhap', dsPhieu);
+
+            const dsCT = DB.get('ttcn_chi_tiet_phieu_nhap');
+            chiTietMoi.forEach(c => dsCT.push(c));
+            DB.set('ttcn_chi_tiet_phieu_nhap', dsCT);
+
+            alert(`✅ Đã lưu phiếu nhập ${maPN} thành công!\nTrạng thái: Chờ nhập hàng`);
+            Navigation.navigateTo('importList');
+        });
+
+        document.getElementById('btn-huy').addEventListener('click', () => Navigation.navigateTo('importList'));
+    </script>
 </body>
 </html>

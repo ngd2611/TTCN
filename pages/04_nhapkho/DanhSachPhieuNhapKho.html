@@ -9,9 +9,7 @@
     <link rel="stylesheet" href="../../assets/css/global.css">
 </head>
 <body class="flex h-screen text-slate-800 overflow-hidden">
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col relative overflow-hidden">
-        <!-- Page Content -->
         <div class="flex-1 overflow-y-auto p-6 bg-[#F4F7F9]">
             <!-- Submenu Tabs -->
             <div class="mb-5 border-b border-slate-200">
@@ -27,7 +25,8 @@
                     </a>
                 </nav>
             </div>
-<!-- Page Title + Actions -->
+
+            <!-- Page Title + Actions -->
             <div class="flex items-start justify-between mb-5">
                 <div>
                     <h2 class="text-[20px] font-bold text-slate-800 leading-tight">Danh sách Phiếu nhập kho</h2>
@@ -49,26 +48,15 @@
                 <div class="p-4 border-b border-slate-100 flex flex-wrap items-center gap-3">
                     <div class="relative flex-1 min-w-[220px]">
                         <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-[12px]"></i>
-                        <input type="text" placeholder="In mã phiếu, mã đơn hàng..." class="w-full bg-slate-50 border border-slate-200 rounded-md pl-8 pr-3 py-1.5 text-[13px] outline-none focus:border-blue-500 focus:bg-white transition-colors">
+                        <input type="text" id="filter-search" placeholder="Tìm mã phiếu, nhà cung cấp..." class="w-full bg-slate-50 border border-slate-200 rounded-md pl-8 pr-3 py-1.5 text-[13px] outline-none focus:border-blue-500 focus:bg-white transition-colors">
                     </div>
-
                     <div class="relative min-w-[170px]">
-                        <select class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-[13px] font-medium text-slate-700 outline-none focus:border-blue-500 pr-8">
-                            <option>Tất cả trạng thái</option>
-                            <option>Đã nhập kho</option>
-                            <option>Chờ nhập hàng</option>
+                        <select id="filter-status" class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5 text-[13px] font-medium text-slate-700 outline-none focus:border-blue-500 pr-8">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Da_Nhap_Kho">Đã nhập kho</option>
+                            <option value="Cho_Nhap_Hang">Chờ nhập hàng</option>
                         </select>
                         <i class="fas fa-chevron-down absolute right-3 top-2.5 text-slate-400 text-[11px] pointer-events-none"></i>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                        <div class="flex items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5">
-                            <input type="date" class="bg-transparent outline-none text-[13px] text-slate-500 w-[130px]">
-                        </div>
-                        <span class="text-slate-400 text-[12px]">—</span>
-                        <div class="flex items-center bg-slate-50 border border-slate-200 rounded-md px-3 py-1.5">
-                            <input type="date" class="bg-transparent outline-none text-[13px] text-slate-500 w-[130px]">
-                        </div>
                     </div>
                 </div>
 
@@ -85,164 +73,126 @@
                                 <th class="py-3 px-4 font-bold text-slate-500 uppercase text-[11px] text-center">Thao tác</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
-
-                            <!-- Row 1 - Đã nhập kho -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202605-001</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600">01/05/2026 14:20</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">Đại lý Daiichi Hạ Long</td>
-                                <td class="py-3 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">KNA-2405-00892</a>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <i class="fas fa-check-circle text-[10px]"></i> Đã nhập kho
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-1.5">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                        <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="In phiếu">
-                                            <i class="fas fa-print text-[12px]"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 2 - Chờ nhập hàng -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202605-002</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600">04/05/2026 10:15</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">Công ty TNHH Knauf Việt Nam</td>
-                                <td class="py-3 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">VT/DELI/2026/7710</a>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <i class="fas fa-truck text-[10px]"></i> Chờ nhập hàng
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-1.5">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                        <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="In phiếu">
-                                            <i class="fas fa-print text-[12px]"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 3 - Chờ nhập hàng -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202605-003</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600">03/05/2026 09:00</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">Công ty CP Công nghiệp Daiichi</td>
-                                <td class="py-3 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">PX-99182</a>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <i class="fas fa-truck text-[10px]"></i> Chờ nhập hàng
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-1.5">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                        <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="In phiếu">
-                                            <i class="fas fa-print text-[12px]"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 4 - Đã nhập kho -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202604-004</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600">30/04/2026 16:45</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">Công ty TNHH Gyproc Việt Nam</td>
-                                <td class="py-3 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">GYP/2604/00124</a>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                        <i class="fas fa-check-circle text-[10px]"></i> Đã nhập kho
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-1.5">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                        <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="In phiếu">
-                                            <i class="fas fa-print text-[12px]"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <!-- Row 5 - Chờ nhập hàng -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="py-3 px-5">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">PNK-202604-005</a>
-                                </td>
-                                <td class="py-3 px-4 text-slate-600">28/04/2026 08:30</td>
-                                <td class="py-3 px-4 font-medium text-slate-800">Đại lý Vật liệu Xây dựng Bắc Nam</td>
-                                <td class="py-3 px-4">
-                                    <a href="#" class="font-semibold text-blue-600 hover:underline">BN-DL/2604/0055</a>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
-                                        <i class="fas fa-truck text-[10px]"></i> Chờ nhập hàng
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center space-x-1.5">
-                                        <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết">
-                                            <i class="fas fa-eye text-[12px]"></i>
-                                        </button>
-                                        <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="In phiếu">
-                                            <i class="fas fa-print text-[12px]"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
+                        <tbody id="phieu-nhap-tbody" class="divide-y divide-slate-100">
+                            <!-- Render bởi JS -->
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Empty state -->
+                <div id="empty-state" class="hidden py-16 text-center">
+                    <i class="fas fa-box-open text-3xl text-slate-300 mb-3"></i>
+                    <p class="text-slate-400 text-[13px]">Chưa có phiếu nhập nào.</p>
+                </div>
+
+                <!-- Pagination info -->
                 <div class="px-5 py-3 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between">
-                    <p class="text-[12px] text-slate-500 font-medium">Hiển thị 1 - 10 trên tổng 45 phiếu nhập</p>
-                    <div class="flex items-center space-x-1">
-                        <button class="px-3 py-1 text-[12px] font-semibold text-slate-400 hover:text-slate-600 transition-colors">Trước</button>
-                        <button class="w-7 h-7 rounded-md bg-[#2563EB] text-white text-[12px] font-bold flex items-center justify-center">1</button>
-                        <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-600 text-[12px] font-semibold flex items-center justify-center transition-colors">2</button>
-                        <button class="w-7 h-7 rounded-md hover:bg-slate-100 text-slate-600 text-[12px] font-semibold flex items-center justify-center transition-colors">3</button>
-                        <button class="px-3 py-1 text-[12px] font-semibold text-slate-600 hover:text-slate-800 transition-colors">Sau</button>
-                    </div>
+                    <p class="text-[12px] text-slate-500 font-medium" id="pagination-info">Đang tải...</p>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Load Core Scripts -->
+    <script src="../../assets/js/mock_data.js"></script>
     <script src="../../assets/js/navigation.js"></script>
     <script src="../../assets/js/main.js"></script>
+    <script>
+        function trangThaiPhieuNhap(trangThai) {
+            if (trangThai === 'Da_Nhap_Kho') {
+                return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <i class="fas fa-check-circle text-[10px]"></i> Đã nhập kho</span>`;
+            }
+            return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                <i class="fas fa-truck text-[10px]"></i> Chờ nhập hàng</span>`;
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('phieu-nhap-tbody');
+            const emptyState = document.getElementById('empty-state');
+            const info = document.getElementById('pagination-info');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                info.textContent = 'Không có dữ liệu';
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            info.textContent = `Hiển thị ${data.length} phiếu nhập`;
+
+            tbody.innerHTML = data.map(p => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="py-3 px-5">
+                        <span class="font-semibold text-blue-600">${p.Ma_Phieu_Nhap}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-600">${formatDateTime(p.Ngay_Nhap)}</td>
+                    <td class="py-3 px-4 font-medium text-slate-800">${p.Ten_NCC}</td>
+                    <td class="py-3 px-4">
+                        <span class="font-semibold text-blue-600">${p.Chung_Tu_Goc || '—'}</span>
+                    </td>
+                    <td class="py-3 px-4 text-center">${trangThaiPhieuNhap(p.Trang_Thai)}</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center space-x-1.5">
+                            <button class="w-7 h-7 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 flex items-center justify-center transition-colors" title="Xem chi tiết" onclick="xemChiTiet('${p.Ma_Phieu_Nhap}')">
+                                <i class="fas fa-eye text-[12px]"></i>
+                            </button>
+                            <button class="w-7 h-7 rounded-md bg-slate-50 hover:bg-slate-100 text-slate-500 flex items-center justify-center transition-colors" title="In phiếu" onclick="inPhieu('${p.Ma_Phieu_Nhap}')">
+                                <i class="fas fa-print text-[12px]"></i>
+                            </button>
+                            <button class="w-7 h-7 rounded-md bg-red-50 hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors" title="Xóa" onclick="xoaPhieu('${p.Ma_Phieu_Nhap}')">
+                                <i class="fas fa-trash text-[12px]"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadData() {
+            let data = DB.get('ttcn_phieu_nhap');
+            const search = document.getElementById('filter-search').value.toLowerCase();
+            const status = document.getElementById('filter-status').value;
+
+            if (search) {
+                data = data.filter(p =>
+                    p.Ma_Phieu_Nhap.toLowerCase().includes(search) ||
+                    p.Ten_NCC.toLowerCase().includes(search) ||
+                    (p.Chung_Tu_Goc || '').toLowerCase().includes(search)
+                );
+            }
+            if (status) {
+                data = data.filter(p => p.Trang_Thai === status);
+            }
+            renderTable(data);
+        }
+
+        function xemChiTiet(ma) {
+            alert('Chi tiết phiếu: ' + ma + '\n(Tính năng xem chi tiết sẽ được phát triển tiếp theo)');
+        }
+
+        function inPhieu(ma) {
+            alert('In phiếu: ' + ma);
+        }
+
+        function xoaPhieu(ma) {
+            if (!confirm(`Bạn có chắc muốn xóa phiếu ${ma}?`)) return;
+            let data = DB.get('ttcn_phieu_nhap');
+            data = data.filter(p => p.Ma_Phieu_Nhap !== ma);
+            DB.set('ttcn_phieu_nhap', data);
+
+            let chiTiet = DB.get('ttcn_chi_tiet_phieu_nhap');
+            chiTiet = chiTiet.filter(c => c.Ma_Phieu_Nhap !== ma);
+            DB.set('ttcn_chi_tiet_phieu_nhap', chiTiet);
+
+            loadData();
+        }
+
+        document.getElementById('filter-search').addEventListener('input', loadData);
+        document.getElementById('filter-status').addEventListener('change', loadData);
+
+        // Khởi chạy
+        loadData();
+    </script>
 </body>
 </html>

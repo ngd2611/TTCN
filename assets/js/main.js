@@ -40,23 +40,23 @@ const App = {
                 console.log('✅ User session loaded:', user.name);
             } catch (e) {
                 console.error('❌ Error parsing user session:', e);
-                this.setDefaultUser();
+                this.redirectToLogin();
             }
         } else {
-            this.setDefaultUser();
+            this.redirectToLogin();
         }
     },
 
-    // Set default user
-    setDefaultUser() {
-        const mockUser = {
-            name: 'Vân',
-            role: 'Giám đốc',
-            department: 'Ban Giám đốc',
-            avatar: 'V'
-        };
-        this.updateUserInfo(mockUser);
-        localStorage.setItem('ttcn_user_session', JSON.stringify(mockUser));
+    redirectToLogin() {
+        if (window.self !== window.top) {
+            return;
+        }
+        const path = window.location.pathname;
+        let prefix = '';
+        if (path.includes('/pages/')) {
+            prefix = '../../';
+        }
+        window.location.href = prefix + 'pages/01_auth/Tranglogin.html';
     },
 
     // Cập nhật thông tin user trên header
@@ -206,7 +206,7 @@ const App = {
     logout() {
         if (confirm('Bạn có chắc muốn đăng xuất?')) {
             localStorage.removeItem('ttcn_user_session');
-            window.location.href = '01_auth/Tranglogin.html';
+            this.redirectToLogin();
         }
     },
 
@@ -236,11 +236,13 @@ const App = {
     }
 };
 
-// Auto-init khi DOM ready
+// Auto-init khi DOM ready (chỉ chạy ở window ngoài cùng, không chạy trong iframe)
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => App.init());
+    document.addEventListener('DOMContentLoaded', () => {
+        if (window.self === window.top) App.init();
+    });
 } else {
-    App.init();
+    if (window.self === window.top) App.init();
 }
 
 // Export global

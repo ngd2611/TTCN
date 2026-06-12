@@ -68,7 +68,7 @@ const Auth = {
             console.log('✅ Login successful:', user.name);
             
             // Redirect to dashboard
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         } else {
             alert('❌ Tên đăng nhập hoặc mật khẩu không đúng!');
         }
@@ -78,14 +78,14 @@ const Auth = {
         const session = localStorage.getItem('ttcn_user_session');
         if (session && window.location.pathname.includes('Tranglogin.html')) {
             console.log('🔄 Existing session found, redirecting...');
-            window.location.href = '../index.html';
+            window.location.href = '../../index.html';
         }
     },
 
     logout() {
         localStorage.removeItem('ttcn_user_session');
         localStorage.removeItem('ttcn_remember_me');
-        window.location.href = '01_auth/Tranglogin.html';
+        window.location.href = 'Tranglogin.html';
     }
 };
 
